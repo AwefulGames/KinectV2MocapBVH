@@ -79,6 +79,9 @@ private:
     ID2D1SolidColorBrush*   m_pBrushHandOpen;
     ID2D1SolidColorBrush*   m_pBrushHandLasso;
 
+    // Test writing
+    IDWriteTextFormat* pTextFormat_;
+    
     /// <summary>
     /// Main processing function
     /// </summary>
