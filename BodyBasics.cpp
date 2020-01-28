@@ -277,6 +277,24 @@ LRESULT CALLBACK CBodyBasics::DlgProc(HWND hWnd, UINT message, WPARAM wParam, LP
             // Init Direct2D
             D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
 
+DWriteCreateFactory(
+        DWRITE_FACTORY_TYPE_SHARED,
+        __uuidof(IDWriteFactory),
+        reinterpret_cast<IUnknown**>(&pDWriteFactory_)
+        );
+		
+pDWriteFactory_->CreateTextFormat(
+        L"Arial",                // Font family name.
+        NULL,                       // Font collection (NULL sets it to use the system font collection).
+        DWRITE_FONT_WEIGHT_REGULAR,
+        DWRITE_FONT_STYLE_NORMAL,
+        DWRITE_FONT_STRETCH_NORMAL,
+        18.0f,
+        L"en-us",
+        &pTextFormat_
+        );
+
+		
             // Get and initialize the default Kinect sensor
             InitializeDefaultSensor();
         }
@@ -407,6 +425,64 @@ void CBodyBasics::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 							ProcessBonesOrientation(joints);
 							entered_the_loop = true;
 
+				// Quick text test
+				float x_pos = joints[JointType_HipLeft].Position.X;
+				float y_pos = joints[JointType_HipLeft].Position.Y;
+				float z_pos = joints[JointType_HipLeft].Position.Z;
+				
+				std::string x_str = std::to_string(x_pos);
+				std::string y_str = std::to_string(y_pos);
+				std::string z_str = std::to_string(z_pos);
+				
+				D2D1_RECT_F rectfx = D2D1::RectF(100, 100, 200, 200);
+				D2D1_RECT_F rectfy = D2D1::RectF(200, 100, 300, 200);
+				D2D1_RECT_F rectfz = D2D1::RectF(300, 100, 400, 200);
+				
+				m_d2dContext->DrawText(std::wstring(x_str), 
+						       wcslen(x_str), 
+						       pTextFormat_, 
+						       rectfx, 
+						       m_pBrushHandOpen);
+				m_d2dContext->DrawText(std::wstring(y_str), 
+						       wcslen(y_str), 
+						       pTextFormat_, 
+						       rectfy, 
+						       m_pBrushHandOpen);
+				m_d2dContext->DrawText(std::wstring(z_str), 
+						       wcslen(z_str), 
+						       pTextFormat_, 
+						       rectfz, 
+						       m_pBrushHandOpen);	
+				
+				x_pos = joints[JointType_KneeLeft].Position.X;
+				y_pos = joints[JointType_KneeLeft].Position.Y;
+				z_pos = joints[JointType_KneeLeft].Position.Z;
+				
+				x_str = std::to_string(x_pos);
+				y_str = std::to_string(y_pos);
+				z_str = std::to_string(z_pos);
+				
+				rectfx = D2D1::RectF(100, 200, 200, 400);
+				rectfy = D2D1::RectF(200, 200, 300, 400);
+				rectfz = D2D1::RectF(300, 200, 400, 400);
+				
+				m_d2dContext->DrawText(std::wstring(x_str), 
+						       wcslen(x_str), 
+						       pTextFormat_, 
+						       rectfx, 
+						       m_pBrushHandOpen);
+				m_d2dContext->DrawText(std::wstring(y_str), 
+						       wcslen(y_str), 
+						       pTextFormat_, 
+						       rectfy, 
+						       m_pBrushHandOpen);
+				m_d2dContext->DrawText(std::wstring(z_str), 
+						       wcslen(z_str), 
+						       pTextFormat_, 
+						       rectfz, 
+						       m_pBrushHandOpen);					
+				
+				
                             for (int j = 0; j < _countof(joints); ++j)
                             {
                                 jointPoints[j] = BodyToScreen(joints[j].Position, width, height);
