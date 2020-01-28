@@ -80,6 +80,7 @@ private:
     ID2D1SolidColorBrush*   m_pBrushHandLasso;
 
     // Test writing
+    IDWriteFactory* pDWriteFactory_;
     IDWriteTextFormat* pTextFormat_;
     
     /// <summary>
