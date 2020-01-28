@@ -7,6 +7,7 @@
 #pragma once
 
 #include "resource.h"
+#include "dwrite.h"
 
 class CBodyBasics
 {

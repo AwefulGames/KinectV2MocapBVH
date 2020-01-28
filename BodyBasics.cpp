@@ -12,6 +12,8 @@
 #include "kinectbvh.h"
 #include <iostream>
 #include <time.h>
+#include "dwrite.h"
+#pragma comment(lib, "Dwrite")
 
 using namespace std;
 
@@ -438,18 +440,18 @@ void CBodyBasics::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 				D2D1_RECT_F rectfy = D2D1::RectF(200, 100, 300, 200);
 				D2D1_RECT_F rectfz = D2D1::RectF(300, 100, 400, 200);
 				
-				m_d2dContext->DrawText(std::wstring(x_str), 
-						       wcslen(x_str), 
+				m_pRenderTarget->DrawText(std::wstring(x_str.begin(), x_str.end()).c_str(),
+						       wcslen(std::wstring(x_str.begin(), x_str.end()).c_str()),
 						       pTextFormat_, 
 						       rectfx, 
 						       m_pBrushHandOpen);
-				m_d2dContext->DrawText(std::wstring(y_str), 
-						       wcslen(y_str), 
+				m_pRenderTarget->DrawText(std::wstring(y_str.begin(), y_str.end()).c_str(),
+						       wcslen(std::wstring(y_str.begin(), y_str.end()).c_str()),
 						       pTextFormat_, 
 						       rectfy, 
 						       m_pBrushHandOpen);
-				m_d2dContext->DrawText(std::wstring(z_str), 
-						       wcslen(z_str), 
+				m_pRenderTarget->DrawText(std::wstring(z_str.begin(), z_str.end()).c_str(),
+						       wcslen(std::wstring(z_str.begin(), z_str.end()).c_str()),
 						       pTextFormat_, 
 						       rectfz, 
 						       m_pBrushHandOpen);	
@@ -466,18 +468,18 @@ void CBodyBasics::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 				rectfy = D2D1::RectF(200, 200, 300, 400);
 				rectfz = D2D1::RectF(300, 200, 400, 400);
 				
-				m_d2dContext->DrawText(std::wstring(x_str), 
-						       wcslen(x_str), 
+				m_pRenderTarget->DrawText(std::wstring(x_str.begin(), x_str.end()).c_str(),
+						       wcslen(std::wstring(x_str.begin(), x_str.end()).c_str()),
 						       pTextFormat_, 
 						       rectfx, 
 						       m_pBrushHandOpen);
-				m_d2dContext->DrawText(std::wstring(y_str), 
-						       wcslen(y_str), 
+				m_pRenderTarget->DrawText(std::wstring(y_str.begin(), y_str.end()).c_str(),
+						       wcslen(std::wstring(y_str.begin(), y_str.end()).c_str()),
 						       pTextFormat_, 
 						       rectfy, 
 						       m_pBrushHandOpen);
-				m_d2dContext->DrawText(std::wstring(z_str), 
-						       wcslen(z_str), 
+				m_pRenderTarget->DrawText(std::wstring(z_str.begin(), z_str.end()).c_str(),
+						       wcslen(std::wstring(z_str.begin(), z_str.end()).c_str()),
 						       pTextFormat_, 
 						       rectfz, 
 						       m_pBrushHandOpen);					
