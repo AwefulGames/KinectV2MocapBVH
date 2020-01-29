@@ -28,7 +28,7 @@ bool bIsCalibrated = false;
 
 
 KinectBVH* m_pKinectBVH = NULL;
-void ProcessBonesOrientation(const Joint* pJoints)
+void ProcessBonesOrientation(const Joint* pJoints, const JointOrientation* pJointsOrientation)
 {
     vector<Joint2> joints(JOINT_SIZE);
     // Fill joints
@@ -39,9 +39,66 @@ void ProcessBonesOrientation(const Joint* pJoints)
         joints[i].pos.y = pJoints[i].Position.Y;
     //    // convert to right hand coordinate
         joints[i].pos.z = -pJoints[i].Position.Z;
+
+		joints[i].quat.x = pJointsOrientation[i].Orientation.x;
+		joints[i].quat.y = pJointsOrientation[i].Orientation.y;
+		joints[i].quat.z = pJointsOrientation[i].Orientation.z;
+		joints[i].quat.w = pJointsOrientation[i].Orientation.w;
+
+
+//		joints[i].quat = quat_right_multiply(joints[i].quat, z_axis);
+		//joints[i].quat = quat_left_multiply(quat_left_multiply(tempQuat, y_axis), z_axis);
+
+		//tempQuat = quat_rotate_axis_angle(joints[i].quat, y_axis, 0.0f);
+		//joints[i].quat = tempQuat;
+		//tempQuat = quat_rotate_axis_angle(joints[i].quat, y_axis, kPiDiv2);
+		//joints[i].quat = quat_rotate_axis_angle(tempQuat, z_axis, -kPiDiv2);
+
+		//tempQuat = quat_rotate_axis_angle(joints[i].quat, y_axis, kPiDiv2);
+		//joints[i].quat = tempQuat;
+
 		TrackingState jointState = pJoints[i].TrackingState;
 		joints[i].tracked = true;// jointState != TrackingState_NotTracked;
     }
+
+	Quaternion tempQuat;
+	Vec3 y_axis;
+	y_axis.x = 0;
+	y_axis.y = 1;
+	y_axis.z = 0;
+	//y_axis.w = kPiDiv2;
+
+	Vec3 z_axis;
+	y_axis.x = 0;
+	y_axis.y = 0;
+	y_axis.z = 1;
+	//y_axis.w = kPi;
+
+	joints[JointType_HipLeft].quat = joints[JointType_KneeLeft].quat;
+	joints[JointType_KneeLeft].quat = joints[JointType_AnkleLeft].quat;
+	joints[JointType_AnkleLeft].quat = joints[JointType_FootLeft].quat;
+
+	joints[JointType_HipRight].quat = joints[JointType_KneeRight].quat;
+	joints[JointType_KneeRight].quat = joints[JointType_AnkleRight].quat;
+	joints[JointType_AnkleRight].quat = joints[JointType_AnkleRight].quat;
+
+	joints[JointType_ShoulderLeft].quat = joints[JointType_ElbowLeft].quat;
+	joints[JointType_ElbowLeft].quat = joints[JointType_WristLeft].quat;
+	joints[JointType_WristLeft].quat = joints[JointType_HandLeft].quat;
+
+	joints[JointType_ShoulderRight].quat = joints[JointType_ElbowRight].quat;
+	joints[JointType_ElbowRight].quat = joints[JointType_WristRight].quat;
+	joints[JointType_WristRight].quat = joints[JointType_HandRight].quat;
+
+	joints[JointType_SpineBase].quat = joints[JointType_SpineMid].quat;
+	joints[JointType_SpineMid].quat = joints[JointType_Neck].quat;
+	joints[JointType_Neck].quat = joints[JointType_Head].quat;
+
+	//joints[JointType_HipLeft].quat = quat_rotate_axis_angle(joints[JointType_KneeLeft].quat, z_axis, kPiDiv2);
+	//joints[JointType_HipLeft].quat = quat_rotate_axis_angle(joints[JointType_HipLeft].quat, z_axis, 0.0f);
+
+	//joints[JointType_HipRight].quat = quat_rotate_axis_angle(joints[JointType_KneeRight].quat, y_axis, kPiDiv2);
+	//joints[JointType_KneeRight].quat = quat_rotate_axis_angle(joints[JointType_HipLeft].quat, z_axis, kPiDiv2);
 
     // Add the positions of all joints.
     m_pKinectBVH->AddAllJointsPosition(&joints[0]);
@@ -50,6 +107,15 @@ void ProcessBonesOrientation(const Joint* pJoints)
     m_pKinectBVH->IncrementNbFrames();
 }
 
+
+CameraSpacePoint CreateEndPoint(CameraSpacePoint startP, QUAT_INPUT q)
+{
+	CameraSpacePoint point;
+	point.X = startP.X + q.x;
+	point.Y = startP.Y + q.y;
+	point.Z = startP.Z + q.z;
+	return point;
+}
 
 /// <summary>
 /// Entry point for the application
@@ -398,6 +464,8 @@ void CBodyBasics::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
                     if (SUCCEEDED(hr) && bTracked)
                     {
                         Joint joints[JointType_Count]; 
+						JointOrientation jointsOrientation[JointType_Count];
+
                         D2D1_POINT_2F jointPoints[JointType_Count];
                         HandState leftHandState = HandState_Unknown;
                         HandState rightHandState = HandState_Unknown;
@@ -406,6 +474,7 @@ void CBodyBasics::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
                         pBody->get_HandRightState(&rightHandState);
 
                         hr = pBody->GetJoints(_countof(joints), joints);
+						hr = pBody->GetJointOrientations(_countof(jointsOrientation), jointsOrientation);
                         if (SUCCEEDED(hr))
                         {
 
@@ -424,70 +493,44 @@ void CBodyBasics::ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies)
 							}
 
 							// then we push the skelly-boi to our processing stuff
-							ProcessBonesOrientation(joints);
+							ProcessBonesOrientation(joints, jointsOrientation);
 							entered_the_loop = true;
 
-				// Quick text test
-				float x_pos = joints[JointType_HipLeft].Position.X;
-				float y_pos = joints[JointType_HipLeft].Position.Y;
-				float z_pos = joints[JointType_HipLeft].Position.Z;
-				
-				std::string x_str = std::to_string(x_pos);
-				std::string y_str = std::to_string(y_pos);
-				std::string z_str = std::to_string(z_pos);
-				
-				D2D1_RECT_F rectfx = D2D1::RectF(100, 100, 200, 200);
-				D2D1_RECT_F rectfy = D2D1::RectF(200, 100, 300, 200);
-				D2D1_RECT_F rectfz = D2D1::RectF(300, 100, 400, 200);
-				
-				m_pRenderTarget->DrawText(std::wstring(x_str.begin(), x_str.end()).c_str(),
-						       wcslen(std::wstring(x_str.begin(), x_str.end()).c_str()),
-						       pTextFormat_, 
-						       rectfx, 
-						       m_pBrushHandOpen);
-				m_pRenderTarget->DrawText(std::wstring(y_str.begin(), y_str.end()).c_str(),
-						       wcslen(std::wstring(y_str.begin(), y_str.end()).c_str()),
-						       pTextFormat_, 
-						       rectfy, 
-						       m_pBrushHandOpen);
-				m_pRenderTarget->DrawText(std::wstring(z_str.begin(), z_str.end()).c_str(),
-						       wcslen(std::wstring(z_str.begin(), z_str.end()).c_str()),
-						       pTextFormat_, 
-						       rectfz, 
-						       m_pBrushHandOpen);	
-				
-				x_pos = joints[JointType_KneeLeft].Position.X;
-				y_pos = joints[JointType_KneeLeft].Position.Y;
-				z_pos = joints[JointType_KneeLeft].Position.Z;
-				
-				x_str = std::to_string(x_pos);
-				y_str = std::to_string(y_pos);
-				z_str = std::to_string(z_pos);
-				
-				rectfx = D2D1::RectF(100, 200, 200, 400);
-				rectfy = D2D1::RectF(200, 200, 300, 400);
-				rectfz = D2D1::RectF(300, 200, 400, 400);
-				
-				m_pRenderTarget->DrawText(std::wstring(x_str.begin(), x_str.end()).c_str(),
-						       wcslen(std::wstring(x_str.begin(), x_str.end()).c_str()),
-						       pTextFormat_, 
-						       rectfx, 
-						       m_pBrushHandOpen);
-				m_pRenderTarget->DrawText(std::wstring(y_str.begin(), y_str.end()).c_str(),
-						       wcslen(std::wstring(y_str.begin(), y_str.end()).c_str()),
-						       pTextFormat_, 
-						       rectfy, 
-						       m_pBrushHandOpen);
-				m_pRenderTarget->DrawText(std::wstring(z_str.begin(), z_str.end()).c_str(),
-						       wcslen(std::wstring(z_str.begin(), z_str.end()).c_str()),
-						       pTextFormat_, 
-						       rectfz, 
-						       m_pBrushHandOpen);					
+							
 				
 				
                             for (int j = 0; j < _countof(joints); ++j)
                             {
                                 jointPoints[j] = BodyToScreen(joints[j].Position, width, height);
+
+								Vector4 vec = jointsOrientation[j].Orientation;
+								Quaternion qOrientation;
+								qOrientation.w = vec.w;
+								qOrientation.x = vec.x;
+								qOrientation.y = vec.y; 
+								qOrientation.z = vec.z;
+
+								Vec3 y_Axis;
+								y_Axis.x = 0.0f;
+								y_Axis.y = 0.1f;
+								y_Axis.z = 0.0f;
+
+								CameraSpacePoint csY = CreateEndPoint(joints[j].Position, quat_rotate_axis_angle(qOrientation, y_Axis, 0.0f));
+								DepthSpacePoint dpY = { 0 };
+
+								m_pCoordinateMapper->MapCameraPointToDepthSpace(csY, &dpY);
+
+								float screenPointX = static_cast<float>(dpY.X * width) / cDepthWidth;
+								float screenPointY = static_cast<float>(dpY.Y * height) / cDepthHeight;
+
+								D2D1_POINT_2F final_point;
+								final_point.x = screenPointX;
+								final_point.y = screenPointY;
+								
+								//drawingContext.DrawLine(yCoordPen, jointPoints[jointType], new Point(dsY.X, dsY.Y))
+
+
+								m_pRenderTarget->DrawLine(jointPoints[j], final_point, m_pBrushHandClosed, 2.0);
                             }
 
                             DrawBody(joints, jointPoints);

@@ -206,7 +206,7 @@ public:
         }
     }
     
-    // Add the positions of all joints.
+    // Add the positions of all joints. and orientations
     void AddAllJointsPosition(const Joint2* joints) {
         for (int i = 0; i < JOINT_SIZE; i++) {
             m_vJointsOrientation.push_back(joints[i]);
@@ -220,9 +220,9 @@ public:
     void SaveToBVHFile(const string& filename) {
         m_pFile.open(filename.c_str());
         if (m_pFile.is_open()) {
-            FilterPositions();
-            CorrectAngle(tilt_angle);
-            CreateQuaternionInformation();
+            //FilterPositions();
+            //CorrectAngle(tilt_angle);
+            //CreateQuaternionInformation();
             CreateSkeletonInformation();
             CreateMotionInformation();
             m_pFile.close();
@@ -259,13 +259,22 @@ private:
     // Write the motion capture data of a joint.
     void WriteJoint(stringstream& flux, const Joint2* joints, const int idx) {
         Vec3 angles = GetEulers(joints, idx);
+
         flux << angles.z * kRadToDeg << " " << angles.y * kRadToDeg << " "
         << angles.x * kRadToDeg << " ";
+
+		if (idx == JointType_HipLeft) {
+			cout << "HL: " << joints[JointType_HipLeft].quat.x << " " << joints[JointType_HipLeft].quat.y << " " << joints[JointType_HipLeft].quat.z << " ";
+		}
+		else if (idx == JointType_KneeLeft) {
+			cout << "KL: " << joints[JointType_KneeLeft].quat.x << " " << joints[JointType_KneeLeft].quat.y << " " << joints[JointType_KneeLeft].quat.z << " ";
+		}
     }
     
     // Calculate the Euler angle of joint's relative rotation to its parent.
     Vec3 GetEulers(const Joint2* joints, const int idx) {
-        // Get the quaternion of its parent.
+   
+		// Get the quaternion of its parent.
         Quaternion q_parent;
         if (idx == JointType_SpineBase) {
             q_parent = quat_identity;
@@ -721,7 +730,7 @@ private:
             vx = vec3_add(vec3_mul_scalar(vec3_normalize(v_body_x), dot),
                           vec3_mul_scalar(vec3_normalize(vx), 1 - dot));
             // reverse the direction because knees can only bend to back
-            vx = vec3_negate(vx);
+            //vx = vec3_negate(vx);
             vy = v1;
             vz = vec3_zero;
             m = mat3_from_axis(vx, vy, vz);
@@ -744,7 +753,7 @@ private:
             vx = vec3_add(vec3_mul_scalar(vec3_normalize(v_body_x), dot),
                           vec3_mul_scalar(vec3_normalize(vx), 1 - dot));
             // reverse the direction because knees can only bend to back
-            vx = vec3_negate(vx);
+            //vx = vec3_negate(vx);
             vy = v2;
             vz = vec3_zero;
             m = mat3_from_axis(vx, vy, vz);
@@ -770,7 +779,7 @@ private:
             vx = vec3_add(vec3_mul_scalar(vec3_normalize(v_body_x), dot),
                           vec3_mul_scalar(vec3_normalize(vx), 1 - dot));
             // reverse the direction because knees can only bend to back
-            vx = vec3_negate(vx);
+            //vx = vec3_negate(vx);
             vy = v1;
             vz = vec3_zero;
             m = mat3_from_axis(vx, vy, vz);
@@ -793,7 +802,7 @@ private:
             vx = vec3_add(vec3_mul_scalar(vec3_normalize(v_body_x), dot),
                           vec3_mul_scalar(vec3_normalize(vx), 1 - dot));
             // reverse the direction because knees can only bend to back
-            vx = vec3_negate(vx);
+            //vx = vec3_negate(vx);
             vy = v2;
             vz = vec3_zero;
             m = mat3_from_axis(vx, vy, vz);
