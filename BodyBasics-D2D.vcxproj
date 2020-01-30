@@ -30,6 +30,7 @@
   <ItemGroup>
     <ClInclude Include="BodyBasics.h" />
     <ClInclude Include="catmull_rom.h" />
+    <ClInclude Include="csv_ops.h" />
     <ClInclude Include="kinectbvh.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />

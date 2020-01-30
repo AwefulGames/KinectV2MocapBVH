@@ -1,6 +1,8 @@
 #ifndef KINECTBVH_H
 #define KINECTBVH_H
 
+#include "csv_ops.h"
+
 // BVH use centimeter by default, we scale to meter to match the default unit of Blender.
 #define SCALE 1.0f
 
@@ -52,6 +54,128 @@ typedef struct Joint2 {
     Vec3 pos;
     bool tracked;
 } Joint2;
+
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <sstream>
+
+using namespace std;
+
+
+vector<Joint2> read_record()
+{
+
+	// File pointer 
+	ifstream fin;
+
+	// Open an existing file 
+	fin.open("C:\\Users\\Sara\\Documents\\BodyBasics-D2D\\raw_quats.csv", ios::in);
+
+	vector<Joint2> joints(JOINT_SIZE);
+	OutputDebugStringW(L"Something\n");
+	// Read the Data from the file 
+	// as String Vector 
+	vector<string> row;
+	string line, word, temp;
+	int joint_count = 0;
+	while (getline(fin, line)) {
+
+		// read an entire row and 
+		// store it in a string variable 'line' 
+		
+
+	/*	std::wstring stemp = std::wstring(line.begin(), line.end());
+		LPCWSTR sw = stemp.c_str();
+		OutputDebugStringW(sw);*/
+
+		// used for breaking words 
+		stringstream s(line);
+
+		// read every column data of a row and 
+		// store it in a string variable, 'word'
+		
+		int quat_count = 0;
+		Quaternion temp_quat;
+		Vec3 temp_pos;
+		vector<Quaternion> temp_vec;
+		Joint2 temp_joint;
+		while (getline(s, word, ',')) {
+
+			switch (quat_count) {
+			case 0:
+				temp_pos.x = atof(word.c_str());
+				break;
+			case 1:
+				temp_pos.y = atof(word.c_str());
+				break;
+			case 2:
+				temp_pos.z = atof(word.c_str());
+				break;
+			case 3:
+				temp_quat.x = atof(word.c_str());
+				break;
+			case 4:
+				temp_quat.y = atof(word.c_str());
+				break;
+			case 5:
+				temp_quat.z = atof(word.c_str());
+				break;
+			case 6:
+				temp_quat.w = atof(word.c_str());
+				break;
+			}
+
+			quat_count++;
+			if (quat_count > 6) {
+				quat_count = 0;
+				temp_joint.pos = temp_pos;
+				temp_joint.quat = temp_quat;
+				joints.push_back(temp_joint);
+				joint_count++;
+			}
+
+		}
+	}
+	return joints;
+}
+
+
+
+
+void write_record(vector<Joint2> joints)
+{
+	// file pointer 
+	fstream fout;
+
+	// opens an existing csv file or creates a new file. 
+	fout.open("raw_quats_new.csv", ios::out | ios::app);
+	int line = 0;
+
+	// Read the input 
+	for (int rec = 0; rec < static_cast<int>(joints.size() / JOINT_SIZE); rec++) {
+		// The position of the root joint in centimeter, 
+		Joint2* pjoints = &joints[rec * JOINT_SIZE];
+
+		for (int i = 0; i < JOINT_SIZE; i++) {
+			// Insert the data to file 
+			fout << pjoints[i].pos.x << ","
+				<< pjoints[i].pos.y << ","
+				<< pjoints[i].pos.z << ","
+				<< pjoints[i].quat.x << ","
+				<< pjoints[i].quat.x << ","
+				<< pjoints[i].quat.z << ","
+				<< pjoints[i].quat.w;
+
+			if (i != JOINT_SIZE - 1) fout << ",";
+		}
+		fout << endl;
+	}
+
+	fout.close();
+}
 
 // The most important class.
 class KinectBVH {
@@ -218,6 +342,9 @@ public:
     
     // Create the file, batch generate motion capture data, save to file, close the file.
     void SaveToBVHFile(const string& filename) {
+
+		//write_record(m_vJointsOrientation);
+
         m_pFile.open(filename.c_str());
         if (m_pFile.is_open()) {
             //FilterPositions();

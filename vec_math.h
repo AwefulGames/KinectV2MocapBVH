@@ -1345,4 +1345,7 @@ namespace Vec_Math {
 #pragma GCC diagnostic pop
 #endif
 
+
+
+
 #endif /* include guard */

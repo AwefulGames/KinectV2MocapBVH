@@ -15,6 +15,8 @@
 #include "dwrite.h"
 #pragma comment(lib, "Dwrite")
 
+#include "csv_ops.h"
+
 using namespace std;
 
 static const float c_JointThickness = 3.0f;
@@ -62,6 +64,13 @@ void ProcessBonesOrientation(const Joint* pJoints, const JointOrientation* pJoin
     }
 
 	Quaternion tempQuat;
+
+	Vec3 x_axis;
+	x_axis.x = 1;
+	x_axis.y = 0;
+	x_axis.z = 0;
+	//y_axis.w = kPi;
+
 	Vec3 y_axis;
 	y_axis.x = 0;
 	y_axis.y = 1;
@@ -69,10 +78,28 @@ void ProcessBonesOrientation(const Joint* pJoints, const JointOrientation* pJoin
 	//y_axis.w = kPiDiv2;
 
 	Vec3 z_axis;
-	y_axis.x = 0;
-	y_axis.y = 0;
-	y_axis.z = 1;
+	z_axis.x = 0;
+	z_axis.y = 0;
+	z_axis.z = 1;
 	//y_axis.w = kPi;
+
+	Quaternion x_quat;
+	x_quat.x = 1;
+	x_quat.y = 0;
+	x_quat.z = 0;
+	x_quat.w = kPiDiv2;
+
+	Quaternion y_quat;
+	y_quat.x = 0;
+	y_quat.y = 1;
+	y_quat.z = 0;
+	y_quat.w = kPiDiv2;
+
+	Quaternion z_quat;
+	z_quat.x = 0;
+	z_quat.y = 0;
+	z_quat.z = 1;
+	z_quat.w = -kPiDiv2;
 
 	joints[JointType_HipLeft].quat = joints[JointType_KneeLeft].quat;
 	joints[JointType_KneeLeft].quat = joints[JointType_AnkleLeft].quat;
@@ -94,11 +121,29 @@ void ProcessBonesOrientation(const Joint* pJoints, const JointOrientation* pJoin
 	joints[JointType_SpineMid].quat = joints[JointType_Neck].quat;
 	joints[JointType_Neck].quat = joints[JointType_Head].quat;
 
-	//joints[JointType_HipLeft].quat = quat_rotate_axis_angle(joints[JointType_KneeLeft].quat, z_axis, kPiDiv2);
-	//joints[JointType_HipLeft].quat = quat_rotate_axis_angle(joints[JointType_HipLeft].quat, z_axis, 0.0f);
 
-	//joints[JointType_HipRight].quat = quat_rotate_axis_angle(joints[JointType_KneeRight].quat, y_axis, kPiDiv2);
-	//joints[JointType_KneeRight].quat = quat_rotate_axis_angle(joints[JointType_HipLeft].quat, z_axis, kPiDiv2);
+	//joints[JointType_SpineMid].quat = quat_rotate_axis_angle(quat_rotate_axis_angle(joints[JointType_SpineMid].quat, y_axis, kPiDiv2), z_axis, -kPiDiv2);
+
+	//joints[JointType_Neck].quat = quat_rotate_axis_angle(quat_rotate_axis_angle(joints[JointType_NeckMid].quat, y_axis, kPiDiv2), z_axis, -kPiDiv2);
+	//joints[JointType_Head].quat = quat_rotate_axis_angle(quat_rotate_axis_angle(joints[JointType_Head].quat, y_axis, kPiDiv2), z_axis, -kPiDiv2);
+
+
+	//joints[JointType_ShoulderLeft].quat = quat_rotate_axis_angle(quat_rotate_axis_angle(joints[JointType_ShoulderLeft].quat, y_axis, kPiDiv2), z_axis, -kPiDiv2);
+	//joints[JointType_ElbowLeft].quat = quat_rotate_axis_angle(quat_rotate_axis_angle(joints[JointType_ElbowLeft].quat, y_axis, kPiDiv2), z_axis, -kPiDiv2);
+	//joints[JointType_WristLeft].quat = quat_rotate_axis_angle(quat_rotate_axis_angle(joints[JointType_WristLeft].quat, y_axis, kPiDiv2), z_axis, -kPiDiv2);
+
+	//joints[JointType_ShoulderRight].quat = quat_rotate_axis_angle(quat_rotate_axis_angle(joints[JointType_ShoulderRight].quat, y_axis, kPiDiv2), z_axis, -kPiDiv2);
+	//joints[JointType_ElbowRight].quat = quat_rotate_axis_angle(quat_rotate_axis_angle(joints[JointType_ElbowRight].quat, y_axis, kPiDiv2), z_axis, -kPiDiv2);
+	//joints[JointType_WristRight].quat = quat_rotate_axis_angle(quat_rotate_axis_angle(joints[JointType_WristRight].quat, y_axis, kPiDiv2), z_axis, -kPiDiv2);
+
+	//joints[JointType_HipLeft].quat = quat_rotate_axis_angle(joints[JointType_HipLeft].quat, y_axis, kPi);
+	//joints[JointType_KneeLeft].quat = quat_rotate_axis_angle(joints[JointType_KneeLeft].quat, z_axis, -kPiDiv2);
+	//joints[JointType_FootLeft].quat = quat_rotate_axis_angle(quat_rotate_axis_angle(joints[JointType_FootLeft].quat, y_axis, kPiDiv2), z_axis, -kPiDiv2);
+
+	//joints[JointType_HipRight].quat = quat_right_multiply(quat_right_multiply(joints[JointType_HipRight].quat, y_quat) , x_quat);
+	//joints[JointType_KneeRight].quat = quat_rotate_axis_angle(quat_rotate_axis_angle(joints[JointType_KneeRight].quat, y_axis, kPi), z_axis, -kPiDiv2);
+	//joints[JointType_FootRight].quat = quat_rotate_axis_angle(quat_rotate_axis_angle(joints[JointType_FootRight].quat, y_axis, kPi), z_axis, -kPiDiv2);
+
 
     // Add the positions of all joints.
     m_pKinectBVH->AddAllJointsPosition(&joints[0]);
@@ -229,6 +274,33 @@ int CBodyBasics::Run(HINSTANCE hInstance, int nCmdShow)
 
     // Show window
     ShowWindow(hWndApp, nCmdShow);
+
+	vector<Joint2> records = read_record();
+
+	m_pKinectBVH = new KinectBVH();
+	m_pKinectBVH->SetTiltAngle(0.0f);
+	m_pKinectBVH->CalibrateSkeleton();
+
+	for (int i = 0; i < static_cast<int>(records.size() / JOINT_SIZE); i++) {
+		// The position of the root joint in centimeter, 
+		Joint2* joints = &records[i * JOINT_SIZE];
+
+		// Add the positions of all joints.
+		m_pKinectBVH->AddAllJointsPosition(joints);
+
+		// Increase the frame number.
+		m_pKinectBVH->IncrementNbFrames();
+		
+	}
+	
+
+	time_t nowtime = time(NULL);
+	struct tm *local = localtime(&nowtime);
+	char buf[256];
+	sprintf(buf, "%d-%d-%d-%d-%d-%d.bvh", local->tm_year + 1900, local->tm_mon + 1, local->tm_mday, local->tm_hour, local->tm_min, local->tm_sec);
+	m_pKinectBVH->SaveToBVHFile(buf);
+
+	msg.message = WM_QUIT;
 
     // Main message loop
     while (WM_QUIT != msg.message)
