@@ -285,6 +285,44 @@ int CBodyBasics::Run(HINSTANCE hInstance, int nCmdShow)
 		// The position of the root joint in centimeter, 
 		Joint2* joints = &records[i * JOINT_SIZE];
 
+
+		Vec3 x_axis;
+		x_axis.x = 1;
+		x_axis.y = 0;
+		x_axis.z = 0;
+		//y_axis.w = kPi;
+
+		Vec3 y_axis;
+		y_axis.x = 0;
+		y_axis.y = 1;
+		y_axis.z = 0;
+		//y_axis.w = kPiDiv2;
+
+		Vec3 z_axis;
+		z_axis.x = 0;
+		z_axis.y = 0;
+		z_axis.z = 1;
+		//y_axis.w = kPi;
+
+		Quaternion x_quat;
+		x_quat.x = 1;
+		x_quat.y = 0;
+		x_quat.z = 0;
+		x_quat.w = kPiDiv2;
+
+		Quaternion y_quat;
+		y_quat.x = 0;
+		y_quat.y = 1;
+		y_quat.z = 0;
+		y_quat.w = kPiDiv2;
+
+		Quaternion z_quat;
+		z_quat.x = 0;
+		z_quat.y = 0;
+		z_quat.z = 1;
+		z_quat.w = -kPiDiv2;
+
+
 		// Add the positions of all joints.
 		m_pKinectBVH->AddAllJointsPosition(joints);
 

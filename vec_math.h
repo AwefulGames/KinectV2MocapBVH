@@ -13,10 +13,10 @@ aggregate initializer */
 
 /* MSVC doens't define fminf and fmaxf */
 #if _MSC_VER < 1800
-static float fminf(float a, float b) {
+static double fminf(double a, double b) {
     return (a < b ? a : b);
 }
-static float fmaxf(float a, float b) {
+static double fmaxf(double a, double b) {
     return (a > b ? a : b);
 }
 #endif
@@ -31,33 +31,33 @@ namespace Vec_Math {
     /**
      * Types
      */
-    typedef struct Vec2 { float x, y; } Vec2;
-    typedef struct Vec3 { float x, y, z; } Vec3;
-    typedef struct Vec4 { float x, y, z, w; } Vec4;
+    typedef struct Vec2 { double x, y; } Vec2;
+    typedef struct Vec3 { double x, y, z; } Vec3;
+    typedef struct Vec4 { double x, y, z, w; } Vec4;
     typedef struct Mat3 { Vec3 r0, r1, r2; } Mat3;
     typedef struct Mat4 { Vec4 r0, r1, r2, r3; } Mat4;
     typedef Vec4 Quaternion;
     typedef struct Transform {
         Quaternion orientation;
         Vec3 position;
-        float scale;
+        double scale;
     } Transform;
     typedef Vec4 Plane;
     typedef struct Sphere {
         Vec3 center;
-        float radius;
+        double radius;
     } Sphere;
     
     /**
      * Constants
      */
-    static const float kEpsilon = 0.00001f;
-    static const float kPi = 3.141592653589793238462643383280f;
-    static const float k2Pi = 6.283185307179586476925286766559f;
-    static const float kPiDiv2 = 1.570796326794896619231321691640f;
-    static const float kInvPi = 0.318309886183790671537767526745f;
-    static const float kDegToRad = 0.017453292519943295769236907685f;
-    static const float kRadToDeg = 57.29577951308232087679815481410f;
+    static const double kEpsilon = 0.00001f;
+    static const double kPi = 3.141592653589793238462643383280f;
+    static const double k2Pi = 6.283185307179586476925286766559f;
+    static const double kPiDiv2 = 1.570796326794896619231321691640f;
+    static const double kInvPi = 0.318309886183790671537767526745f;
+    static const double kDegToRad = 0.017453292519943295769236907685f;
+    static const double kRadToDeg = 57.29577951308232087679815481410f;
     
 #ifdef __cplusplus
     extern "C" {  // C linkage
@@ -84,25 +84,25 @@ namespace Vec_Math {
 #define INLINE static __inline
 #endif
         
-        INLINE float rad_to_deg(float r) {
+        INLINE double rad_to_deg(double r) {
             return kRadToDeg * r;
         }
-        INLINE float deg_to_rad(float d) {
+        INLINE double deg_to_rad(double d) {
             return kDegToRad * d;
         }
         
-        INLINE void swapf(float& a, float& b) {
-            float t = a;
+        INLINE void swapf(double& a, double& b) {
+            double t = a;
             a = b;
             b = t;
         }
         
-        INLINE float lerp(float a, float b, float t) {
-            float d = b - a;
-            float tt = d * t;
+        INLINE double lerp(double a, double b, double t) {
+            double d = b - a;
+            double tt = d * t;
             return a + tt;
         }
-        INLINE float saturate(float f) {
+        INLINE double saturate(double f) {
             if (f < 0)
                 return 0.0f;
             if (f > 1.0f)
@@ -113,7 +113,7 @@ namespace Vec_Math {
          * Vec2                                                                       *
          \******************************************************************************/
         static const Vec2 vec2_zero = {0.0f, 0.0f};
-        INLINE Vec2 vec2_create(float x, float y) {
+        INLINE Vec2 vec2_create(double x, double y) {
             Vec2 r;
             r.x = x;
             r.y = y;
@@ -146,50 +146,50 @@ namespace Vec_Math {
         }
         
         /* Scalar math */
-        INLINE Vec2 vec2_add_scalar(VEC2_INPUT v, float f) {
+        INLINE Vec2 vec2_add_scalar(VEC2_INPUT v, double f) {
             Vec2 res;
             res.x = v.x + f;
             res.y = v.y + f;
             return res;
         }
-        INLINE Vec2 vec2_sub_scalar(VEC2_INPUT v, float f) {
+        INLINE Vec2 vec2_sub_scalar(VEC2_INPUT v, double f) {
             Vec2 res;
             res.x = v.x - f;
             res.y = v.y - f;
             return res;
         }
-        INLINE Vec2 vec2_mul_scalar(VEC2_INPUT v, float f) {
+        INLINE Vec2 vec2_mul_scalar(VEC2_INPUT v, double f) {
             Vec2 res;
             res.x = v.x * f;
             res.y = v.y * f;
             return res;
         }
-        INLINE Vec2 vec2_div_scalar(VEC2_INPUT v, float f) {
+        INLINE Vec2 vec2_div_scalar(VEC2_INPUT v, double f) {
             Vec2 res;
             res.x = v.x / f;
             res.y = v.y / f;
             return res;
         }
         /* Misc */
-        INLINE float vec2_hadd(VEC2_INPUT v) {
+        INLINE double vec2_hadd(VEC2_INPUT v) {
             return v.x + v.y;
         }
         INLINE int vec2_equal(VEC2_INPUT a, VEC2_INPUT b) {
             return fabsf(a.x - b.x) < kEpsilon && fabsf(a.y - b.y) < kEpsilon;
         }
-        INLINE int vec2_equal_scalar(VEC2_INPUT v, float f) {
+        INLINE int vec2_equal_scalar(VEC2_INPUT v, double f) {
             return fabsf(v.x - f) < kEpsilon && fabsf(v.y - f) < kEpsilon;
         }
-        INLINE float vec2_length_sq(VEC2_INPUT v) {
+        INLINE double vec2_length_sq(VEC2_INPUT v) {
             return v.x * v.x + v.y * v.y;
         }
-        INLINE float vec2_length(VEC2_INPUT v) {
+        INLINE double vec2_length(VEC2_INPUT v) {
             return sqrtf(vec2_length_sq(v));
         }
-        INLINE float vec2_distance_sq(VEC2_INPUT a, VEC2_INPUT b) {
+        INLINE double vec2_distance_sq(VEC2_INPUT a, VEC2_INPUT b) {
             return vec2_length_sq(vec2_sub(a, b));
         }
-        INLINE float vec2_distance(VEC2_INPUT a, VEC2_INPUT b) {
+        INLINE double vec2_distance(VEC2_INPUT a, VEC2_INPUT b) {
             return sqrtf(vec2_distance_sq(a, b));
         }
         INLINE Vec2 vec2_normalize(VEC2_INPUT v) {
@@ -207,7 +207,7 @@ namespace Vec_Math {
             v.y = fmaxf(a.y, b.y);
             return v;
         }
-        INLINE Vec2 vec2_lerp(VEC2_INPUT a, VEC2_INPUT b, float t) {
+        INLINE Vec2 vec2_lerp(VEC2_INPUT a, VEC2_INPUT b, double t) {
             Vec2 d = vec2_sub(b, a);
             Vec2 tt = vec2_mul_scalar(d, t);
             return vec2_add(a, tt);
@@ -230,7 +230,7 @@ namespace Vec_Math {
             r.z = v.z;
             return r;
         }
-        INLINE Vec3 vec3_create(float x, float y, float z) {
+        INLINE Vec3 vec3_create(double x, double y, double z) {
             Vec3 r;
             r.x = x;
             r.y = y;
@@ -268,28 +268,28 @@ namespace Vec_Math {
         }
         
         /* Scalar math */
-        INLINE Vec3 vec3_add_scalar(VEC3_INPUT v, float f) {
+        INLINE Vec3 vec3_add_scalar(VEC3_INPUT v, double f) {
             Vec3 res;
             res.x = v.x + f;
             res.y = v.y + f;
             res.z = v.z + f;
             return res;
         }
-        INLINE Vec3 vec3_sub_scalar(VEC3_INPUT v, float f) {
+        INLINE Vec3 vec3_sub_scalar(VEC3_INPUT v, double f) {
             Vec3 res;
             res.x = v.x - f;
             res.y = v.y - f;
             res.z = v.z - f;
             return res;
         }
-        INLINE Vec3 vec3_mul_scalar(VEC3_INPUT v, float f) {
+        INLINE Vec3 vec3_mul_scalar(VEC3_INPUT v, double f) {
             Vec3 res;
             res.x = v.x * f;
             res.y = v.y * f;
             res.z = v.z * f;
             return res;
         }
-        INLINE Vec3 vec3_div_scalar(VEC3_INPUT v, float f) {
+        INLINE Vec3 vec3_div_scalar(VEC3_INPUT v, double f) {
             Vec3 res;
             res.x = v.x / f;
             res.y = v.y / f;
@@ -297,27 +297,27 @@ namespace Vec_Math {
             return res;
         }
         /* Misc */
-        INLINE float vec3_hadd(VEC3_INPUT v) {
+        INLINE double vec3_hadd(VEC3_INPUT v) {
             return v.x + v.y + v.z;
         }
         INLINE int vec3_equal(VEC3_INPUT a, VEC3_INPUT b) {
             return fabsf(a.x - b.x) < kEpsilon && fabsf(a.y - b.y) < kEpsilon &&
             fabsf(a.z - b.z) < kEpsilon;
         }
-        INLINE int vec3_equal_scalar(VEC3_INPUT v, float f) {
+        INLINE int vec3_equal_scalar(VEC3_INPUT v, double f) {
             return fabsf(v.x - f) < kEpsilon && fabsf(v.y - f) < kEpsilon &&
             fabsf(v.z - f) < kEpsilon;
         }
-        INLINE float vec3_length_sq(VEC3_INPUT v) {
+        INLINE double vec3_length_sq(VEC3_INPUT v) {
             return v.x * v.x + v.y * v.y + v.z * v.z;
         }
-        INLINE float vec3_length(VEC3_INPUT v) {
+        INLINE double vec3_length(VEC3_INPUT v) {
             return sqrtf(vec3_length_sq(v));
         }
-        INLINE float vec3_distance_sq(VEC3_INPUT a, VEC3_INPUT b) {
+        INLINE double vec3_distance_sq(VEC3_INPUT a, VEC3_INPUT b) {
             return vec3_length_sq(vec3_sub(a, b));
         }
-        INLINE float vec3_distance(VEC3_INPUT a, VEC3_INPUT b) {
+        INLINE double vec3_distance(VEC3_INPUT a, VEC3_INPUT b) {
             return sqrtf(vec3_distance_sq(a, b));
         }
         INLINE Vec3 vec3_normalize(VEC3_INPUT v) {
@@ -337,7 +337,7 @@ namespace Vec_Math {
             v.z = fmaxf(a.z, b.z);
             return v;
         }
-        INLINE Vec3 vec3_lerp(VEC3_INPUT a, VEC3_INPUT b, float t) {
+        INLINE Vec3 vec3_lerp(VEC3_INPUT a, VEC3_INPUT b, double t) {
             Vec3 d = vec3_sub(b, a);
             Vec3 tt = vec3_mul_scalar(d, t);
             return vec3_add(a, tt);
@@ -349,7 +349,7 @@ namespace Vec_Math {
             r.z = -v.z;
             return r;
         }
-        INLINE float vec3_dot(VEC3_INPUT a, VEC3_INPUT b) {
+        INLINE double vec3_dot(VEC3_INPUT a, VEC3_INPUT b) {
             return a.x * b.x + a.y * b.y + a.z * b.z;
         }
         INLINE Vec3 vec3_cross(VEC3_INPUT a, VEC3_INPUT b) {
@@ -364,7 +364,7 @@ namespace Vec_Math {
          * Vec4                                                                       *
          \******************************************************************************/
         static const Vec4 vec4_zero = {0.0f, 0.0f, 0.0f, 0.0f};
-        INLINE Vec4 vec4_from_vec3(VEC3_INPUT v, float w) {
+        INLINE Vec4 vec4_from_vec3(VEC3_INPUT v, double w) {
             Vec4 r;
             r.x = v.x;
             r.y = v.y;
@@ -372,7 +372,7 @@ namespace Vec_Math {
             r.w = w;
             return r;
         }
-        INLINE Vec4 vec4_create(float x, float y, float z, float w) {
+        INLINE Vec4 vec4_create(double x, double y, double z, double w) {
             Vec4 r;
             r.x = x;
             r.y = y;
@@ -415,7 +415,7 @@ namespace Vec_Math {
         }
         
         /* Scalar math */
-        INLINE Vec4 vec4_add_scalar(VEC4_INPUT v, float f) {
+        INLINE Vec4 vec4_add_scalar(VEC4_INPUT v, double f) {
             Vec4 res;
             res.x = v.x + f;
             res.y = v.y + f;
@@ -423,7 +423,7 @@ namespace Vec_Math {
             res.w = v.w + f;
             return res;
         }
-        INLINE Vec4 vec4_sub_scalar(VEC4_INPUT v, float f) {
+        INLINE Vec4 vec4_sub_scalar(VEC4_INPUT v, double f) {
             Vec4 res;
             res.x = v.x - f;
             res.y = v.y - f;
@@ -431,7 +431,7 @@ namespace Vec_Math {
             res.w = v.w - f;
             return res;
         }
-        INLINE Vec4 vec4_mul_scalar(VEC4_INPUT v, float f) {
+        INLINE Vec4 vec4_mul_scalar(VEC4_INPUT v, double f) {
             Vec4 res;
             res.x = v.x * f;
             res.y = v.y * f;
@@ -439,7 +439,7 @@ namespace Vec_Math {
             res.w = v.w * f;
             return res;
         }
-        INLINE Vec4 vec4_div_scalar(VEC4_INPUT v, float f) {
+        INLINE Vec4 vec4_div_scalar(VEC4_INPUT v, double f) {
             Vec4 res;
             res.x = v.x / f;
             res.y = v.y / f;
@@ -448,27 +448,27 @@ namespace Vec_Math {
             return res;
         }
         /* Misc */
-        INLINE float vec4_hadd(VEC4_INPUT v) {
+        INLINE double vec4_hadd(VEC4_INPUT v) {
             return v.x + v.y + v.z + v.w;
         }
         INLINE int vec4_equal(VEC4_INPUT a, VEC4_INPUT b) {
             return fabsf(a.x - b.x) < kEpsilon && fabsf(a.y - b.y) < kEpsilon &&
             fabsf(a.z - b.z) < kEpsilon && fabsf(a.w - b.w) < kEpsilon;
         }
-        INLINE int vec4_equal_scalar(VEC4_INPUT v, float f) {
+        INLINE int vec4_equal_scalar(VEC4_INPUT v, double f) {
             return fabsf(v.x - f) < kEpsilon && fabsf(v.y - f) < kEpsilon &&
             fabsf(v.z - f) < kEpsilon && fabsf(v.w - f) < kEpsilon;
         }
-        INLINE float vec4_length_sq(VEC4_INPUT v) {
+        INLINE double vec4_length_sq(VEC4_INPUT v) {
             return v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w;
         }
-        INLINE float vec4_length(VEC4_INPUT v) {
+        INLINE double vec4_length(VEC4_INPUT v) {
             return sqrtf(vec4_length_sq(v));
         }
-        INLINE float vec4_distance_sq(VEC4_INPUT a, VEC4_INPUT b) {
+        INLINE double vec4_distance_sq(VEC4_INPUT a, VEC4_INPUT b) {
             return vec4_length_sq(vec4_sub(a, b));
         }
-        INLINE float vec4_distance(VEC4_INPUT a, VEC4_INPUT b) {
+        INLINE double vec4_distance(VEC4_INPUT a, VEC4_INPUT b) {
             return sqrtf(vec4_distance_sq(a, b));
         }
         INLINE Vec4 vec4_normalize(VEC4_INPUT v) {
@@ -490,7 +490,7 @@ namespace Vec_Math {
             v.w = fmaxf(a.w, b.w);
             return v;
         }
-        INLINE Vec4 vec4_lerp(VEC4_INPUT a, VEC4_INPUT b, float t) {
+        INLINE Vec4 vec4_lerp(VEC4_INPUT a, VEC4_INPUT b, double t) {
             Vec4 d = vec4_sub(b, a);
             Vec4 tt = vec4_mul_scalar(d, t);
             return vec4_add(a, tt);
@@ -521,21 +521,21 @@ namespace Vec_Math {
             };
             return r;
         }
-        INLINE Mat3 mat3_create(float f00,
-                                float f01,
-                                float f02,
-                                float f10,
-                                float f11,
-                                float f12,
-                                float f20,
-                                float f21,
-                                float f22) {
+        INLINE Mat3 mat3_create(double f00,
+                                double f01,
+                                double f02,
+                                double f10,
+                                double f11,
+                                double f12,
+                                double f20,
+                                double f21,
+                                double f22) {
             Mat3 m = {
                 {f00, f01, f02}, {f10, f11, f12}, {f20, f21, f22},
             };
             return m;
         }
-        INLINE Mat3 mat3_scalef(float x, float y, float z) {
+        INLINE Mat3 mat3_scalef(double x, double y, double z) {
             Mat3 r = mat3_identity;
             r.r0.x = x;
             r.r1.y = y;
@@ -545,9 +545,9 @@ namespace Vec_Math {
         INLINE Mat3 mat3_scale(VEC3_INPUT v) {
             return mat3_scalef(v.x, v.y, v.z);
         }
-        INLINE Mat3 mat3_rotation_x(float rad) {
-            float c = cosf(rad);
-            float s = sinf(rad);
+        INLINE Mat3 mat3_rotation_x(double rad) {
+            double c = cosf(rad);
+            double s = sinf(rad);
             Mat3 r = mat3_identity;
             r.r1.y = c;
             r.r1.z = s;
@@ -555,9 +555,9 @@ namespace Vec_Math {
             r.r2.z = c;
             return r;
         }
-        INLINE Mat3 mat3_rotation_y(float rad) {
-            float c = cosf(rad);
-            float s = sinf(rad);
+        INLINE Mat3 mat3_rotation_y(double rad) {
+            double c = cosf(rad);
+            double s = sinf(rad);
             Mat3 r = mat3_identity;
             r.r0.x = c;
             r.r0.z = -s;
@@ -565,9 +565,9 @@ namespace Vec_Math {
             r.r2.z = c;
             return r;
         }
-        INLINE Mat3 mat3_rotation_z(float rad) {
-            float c = cosf(rad);
-            float s = sinf(rad);
+        INLINE Mat3 mat3_rotation_z(double rad) {
+            double c = cosf(rad);
+            double s = sinf(rad);
             Mat3 r = mat3_identity;
             r.r0.x = c;
             r.r0.y = s;
@@ -575,15 +575,15 @@ namespace Vec_Math {
             r.r1.y = c;
             return r;
         }
-        INLINE Mat3 mat3_rotation_axis(VEC3_INPUT axis, float rad) {
+        INLINE Mat3 mat3_rotation_axis(VEC3_INPUT axis, double rad) {
             Vec3 normAxis = vec3_normalize(axis);
-            float c = cosf(rad);
-            float s = sinf(rad);
-            float t = 1 - c;
+            double c = cosf(rad);
+            double s = sinf(rad);
+            double t = 1 - c;
             
-            float x = normAxis.x;
-            float y = normAxis.y;
-            float z = normAxis.z;
+            double x = normAxis.x;
+            double y = normAxis.y;
+            double z = normAxis.z;
             
             Mat3 m;
             
@@ -601,7 +601,7 @@ namespace Vec_Math {
             
             return m;
         }
-        INLINE Mat3 mat3_mul_scalar(MAT3_INPUT m, float f) {
+        INLINE Mat3 mat3_mul_scalar(MAT3_INPUT m, double f) {
             Mat3 result;
             result.r0 = vec3_mul_scalar(m.r0, f);
             result.r1 = vec3_mul_scalar(m.r1, f);
@@ -612,16 +612,16 @@ namespace Vec_Math {
         INLINE Mat3 mat3_multiply(MAT3_INPUT a, MAT3_INPUT b) {
             Mat3 m = mat3_identity;
             
-            const float* left = &a.r0.x;
-            const float* right = &b.r0.x;
-            float* result = (float*)&m;
+            const double* left = &a.r0.x;
+            const double* right = &b.r0.x;
+            double* result = (double*)&m;
             
             int ii, jj, kk;
             for (ii = 0; ii < 3; ++ii) /* row */
             {
                 for (jj = 0; jj < 3; ++jj) /* column */
                 {
-                    float sum = MTX3_INDEX(left, ii, 0) * MTX3_INDEX(right, 0, jj);
+                    double sum = MTX3_INDEX(left, ii, 0) * MTX3_INDEX(right, 0, jj);
                     for (kk = 1; kk < 3; ++kk) {
                         sum += (MTX3_INDEX(left, ii, kk) * MTX3_INDEX(right, kk, jj));
                     }
@@ -631,10 +631,10 @@ namespace Vec_Math {
             return m;
         }
 #undef MTX3_INDEX
-        INLINE float mat3_determinant(MAT3_INPUT m) {
-            float f0 = m.r0.x * (m.r1.y * m.r2.z - m.r2.y * m.r1.z);
-            float f1 = m.r0.y * -(m.r1.x * m.r2.z - m.r2.x * m.r1.z);
-            float f2 = m.r0.z * (m.r1.x * m.r2.y - m.r2.x * m.r1.y);
+        INLINE double mat3_determinant(MAT3_INPUT m) {
+            double f0 = m.r0.x * (m.r1.y * m.r2.z - m.r2.y * m.r1.z);
+            double f1 = m.r0.y * -(m.r1.x * m.r2.z - m.r2.x * m.r1.z);
+            double f2 = m.r0.z * (m.r1.x * m.r2.y - m.r2.x * m.r1.y);
             
             return f0 + f1 + f2;
         }
@@ -671,7 +671,7 @@ namespace Vec_Math {
             return m;
         }
         INLINE Mat3 mat3_inverse(MAT3_INPUT m) {
-            float det = mat3_determinant(m);
+            double det = mat3_determinant(m);
             Mat3 inv;
             
             inv.r0.x = (m.r1.y * m.r2.z) - (m.r1.z * m.r2.y);
@@ -724,7 +724,7 @@ namespace Vec_Math {
             };
             return r;
         }
-        INLINE Mat4 mat4_scalef(float x, float y, float z) {
+        INLINE Mat4 mat4_scalef(double x, double y, double z) {
             Mat4 r = mat4_identity;
             r.r0.x = x;
             r.r1.y = y;
@@ -734,7 +734,7 @@ namespace Vec_Math {
         INLINE Mat4 mat4_scale(VEC3_INPUT v) {
             return mat4_scalef(v.x, v.y, v.z);
         }
-        INLINE Mat4 mat4_translatef(float x, float y, float z) {
+        INLINE Mat4 mat4_translatef(double x, double y, double z) {
             Mat4 r = mat4_identity;
             r.r3.x = x;
             r.r3.y = y;
@@ -744,9 +744,9 @@ namespace Vec_Math {
         INLINE Mat4 mat4_translate(VEC3_INPUT v) {
             return mat4_translatef(v.x, v.y, v.z);
         }
-        INLINE Mat4 mat4_rotation_x(float rad) {
-            float c = cosf(rad);
-            float s = sinf(rad);
+        INLINE Mat4 mat4_rotation_x(double rad) {
+            double c = cosf(rad);
+            double s = sinf(rad);
             Mat4 r = mat4_identity;
             r.r1.y = c;
             r.r1.z = s;
@@ -754,9 +754,9 @@ namespace Vec_Math {
             r.r2.z = c;
             return r;
         }
-        INLINE Mat4 mat4_rotation_y(float rad) {
-            float c = cosf(rad);
-            float s = sinf(rad);
+        INLINE Mat4 mat4_rotation_y(double rad) {
+            double c = cosf(rad);
+            double s = sinf(rad);
             Mat4 r = mat4_identity;
             r.r0.x = c;
             r.r0.z = -s;
@@ -764,9 +764,9 @@ namespace Vec_Math {
             r.r2.z = c;
             return r;
         }
-        INLINE Mat4 mat4_rotation_z(float rad) {
-            float c = cosf(rad);
-            float s = sinf(rad);
+        INLINE Mat4 mat4_rotation_z(double rad) {
+            double c = cosf(rad);
+            double s = sinf(rad);
             Mat4 r = mat4_identity;
             r.r0.x = c;
             r.r0.y = s;
@@ -774,15 +774,15 @@ namespace Vec_Math {
             r.r1.y = c;
             return r;
         }
-        INLINE Mat4 mat4_rotation_axis(VEC3_INPUT axis, float rad) {
+        INLINE Mat4 mat4_rotation_axis(VEC3_INPUT axis, double rad) {
             Vec3 normAxis = vec3_normalize(axis);
-            float c = cosf(rad);
-            float s = sinf(rad);
-            float t = 1 - c;
+            double c = cosf(rad);
+            double s = sinf(rad);
+            double t = 1 - c;
             
-            float x = normAxis.x;
-            float y = normAxis.y;
-            float z = normAxis.z;
+            double x = normAxis.x;
+            double y = normAxis.y;
+            double z = normAxis.z;
             
             Mat4 m = mat4_identity;
             
@@ -800,7 +800,7 @@ namespace Vec_Math {
             
             return m;
         }
-        INLINE Mat4 mat4_mul_scalar(MAT4_INPUT m, float f) {
+        INLINE Mat4 mat4_mul_scalar(MAT4_INPUT m, double f) {
             Mat4 result;
             result.r0 = vec4_mul_scalar(m.r0, f);
             result.r1 = vec4_mul_scalar(m.r1, f);
@@ -812,16 +812,16 @@ namespace Vec_Math {
         INLINE Mat4 mat4_multiply(MAT4_INPUT a, MAT4_INPUT b) {
             Mat4 m = mat4_identity;
             
-            const float* left = &a.r0.x;
-            const float* right = &b.r0.x;
-            float* result = (float*)&m;
+            const double* left = &a.r0.x;
+            const double* right = &b.r0.x;
+            double* result = (double*)&m;
             
             int ii, jj, kk;
             for (ii = 0; ii < 4; ++ii) /* row */
             {
                 for (jj = 0; jj < 4; ++jj) /* column */
                 {
-                    float sum = MTX4_INDEX(left, ii, 0) * MTX4_INDEX(right, 0, jj);
+                    double sum = MTX4_INDEX(left, ii, 0) * MTX4_INDEX(right, 0, jj);
                     for (kk = 1; kk < 4; ++kk) {
                         sum += (MTX4_INDEX(left, ii, kk) * MTX4_INDEX(right, kk, jj));
                     }
@@ -831,8 +831,8 @@ namespace Vec_Math {
             return m;
         }
 #undef MTX4_INDEX
-        INLINE float mat4_determinant(MAT4_INPUT m) {
-            float det = 0.0f;
+        INLINE double mat4_determinant(MAT4_INPUT m) {
+            double det = 0.0f;
             
             Mat3 a = {{m.r1.y, m.r1.z, m.r1.w},
                 {m.r2.y, m.r2.z, m.r2.w},
@@ -872,7 +872,7 @@ namespace Vec_Math {
         }
         INLINE Mat4 mat4_inverse(MAT4_INPUT mat) {
             Mat4 ret;
-            float recip;
+            double recip;
             
             /* temp matrices */
             
@@ -987,15 +987,15 @@ namespace Vec_Math {
             
             return res;
         }
-        INLINE Mat4 mat4_ortho_off_center(float left,
-                                          float right,
-                                          float bottom,
-                                          float top,
-                                          float nearPlane,
-                                          float farPlane) {
+        INLINE Mat4 mat4_ortho_off_center(double left,
+                                          double right,
+                                          double bottom,
+                                          double top,
+                                          double nearPlane,
+                                          double farPlane) {
             Mat4 m = mat4_identity;
             
-            float diff = farPlane - nearPlane;
+            double diff = farPlane - nearPlane;
             
             m.r0.x = 2.0f / (right - left);
             m.r1.y = 2.0f / (top - bottom);
@@ -1006,22 +1006,22 @@ namespace Vec_Math {
             
             return m;
         }
-        INLINE Mat4 mat4_ortho(float width,
-                               float height,
-                               float nearPlane,
-                               float farPlane) {
-            float halfWidth = width / 2.0f;
-            float halfHeight = height / 2.0f;
+        INLINE Mat4 mat4_ortho(double width,
+                               double height,
+                               double nearPlane,
+                               double farPlane) {
+            double halfWidth = width / 2.0f;
+            double halfHeight = height / 2.0f;
             
             return mat4_ortho_off_center(-halfWidth, halfWidth, -halfHeight, halfHeight,
                                          nearPlane, farPlane);
         }
         /** LH perspective
          */
-        INLINE Mat4 mat4_perspective(float width,
-                                     float height,
-                                     float nearPlane,
-                                     float farPlane) {
+        INLINE Mat4 mat4_perspective(double width,
+                                     double height,
+                                     double nearPlane,
+                                     double farPlane) {
             Mat4 m = mat4_identity;
             
             m.r0.x = 2 * nearPlane / width;
@@ -1034,13 +1034,13 @@ namespace Vec_Math {
         }
         /** LH perspective
          */
-        INLINE Mat4 mat4_perspective_fov(float fov,
-                                         float aspect,
-                                         float nearPlane,
-                                         float farPlane) {
+        INLINE Mat4 mat4_perspective_fov(double fov,
+                                         double aspect,
+                                         double nearPlane,
+                                         double farPlane) {
             Mat4 m = mat4_identity;
-            float y = 1.0f / tanf(fov / 2);
-            float x = y / aspect;
+            double y = 1.0f / tanf(fov / 2);
+            double x = y / aspect;
             
             m.r0.x = x;
             m.r1.y = y;
@@ -1056,11 +1056,11 @@ namespace Vec_Math {
          \******************************************************************************/
         static const Quaternion quat_identity = {0.0f, 0.0f, 0.0f, 1.0f};
         
-        INLINE Quaternion quat_from_axis_angle(Vec3 axis, float rad) {
+        INLINE Quaternion quat_from_axis_angle(Vec3 axis, double rad) {
             Quaternion q;
             Vec3 norm = vec3_normalize(axis);
-            float a = rad * 0.5f;
-            float s = sinf(a);
+            double a = rad * 0.5f;
+            double s = sinf(a);
             q.x = norm.x * s;
             q.y = norm.y * s;
             q.z = norm.z * s;
@@ -1069,24 +1069,34 @@ namespace Vec_Math {
             return q;
         }
 
-        INLINE Quaternion quat_from_axis_anglef(float x, float y, float z, float rad) {
+        INLINE Quaternion quat_from_axis_anglef(double x, double y, double z, double rad) {
             return quat_from_axis_angle(vec3_create(x, y, z), rad);
         }
         INLINE Quaternion quat_normalize(QUAT_INPUT q) {
             return vec4_normalize(q);
         }
+
+		INLINE Vec3 quat_to_vec3(QUAT_INPUT q) {
+			Vec3 vc;
+			vc.x = q.x;
+			vc.y = q.y;
+			vc.z = q.z;
+
+			return vc;
+		}
+
         INLINE Mat3 quat_to_mat3(QUAT_INPUT q) {
             Quaternion norm = quat_normalize(q);
-            float xx = norm.x * norm.x;
-            float yy = norm.y * norm.y;
-            float zz = norm.z * norm.z;
+            double xx = norm.x * norm.x;
+            double yy = norm.y * norm.y;
+            double zz = norm.z * norm.z;
             
-            float xy = norm.x * norm.y;
-            float zw = norm.z * norm.w;
-            float xz = norm.x * norm.z;
-            float yw = norm.y * norm.w;
-            float yz = norm.y * norm.z;
-            float xw = norm.x * norm.w;
+            double xy = norm.x * norm.y;
+            double zw = norm.z * norm.w;
+            double xz = norm.x * norm.z;
+            double yw = norm.y * norm.w;
+            double yz = norm.y * norm.z;
+            double xw = norm.x * norm.w;
             
             Mat3 ret = mat3_create(1 - 2 * (yy + zz), 2 * (xy + zw), 2 * (xz - yw),
                                    2 * (xy - zw), 1 - 2 * (xx + zz), 2 * (yz + xw),
@@ -1098,28 +1108,28 @@ namespace Vec_Math {
             Mat3 a = mat3_transpose(m);
             
             Quaternion q;
-            float trace = a.r0.x + a.r1.y + a.r2.z;
+            double trace = a.r0.x + a.r1.y + a.r2.z;
             if (trace > 0) {
-                float s = 0.5f / sqrtf(trace + 1.0f);
+                double s = 0.5f / sqrtf(trace + 1.0f);
                 q.w = 0.25f / s;
                 q.x = (a.r2.y - a.r1.z) * s;
                 q.y = (a.r0.z - a.r2.x) * s;
                 q.z = (a.r1.x - a.r0.y) * s;
             } else {
                 if (a.r0.x > a.r1.y && a.r0.x > a.r2.z) {
-                    float s = 2.0f * sqrtf(1.0f + a.r0.x - a.r1.y - a.r2.z);
+                    double s = 2.0f * sqrtf(1.0f + a.r0.x - a.r1.y - a.r2.z);
                     q.w = (a.r2.y - a.r1.z) / s;
                     q.x = 0.25f * s;
                     q.y = (a.r0.y + a.r1.x) / s;
                     q.z = (a.r0.z + a.r2.x) / s;
                 } else if (a.r1.y > a.r2.z) {
-                    float s = 2.0f * sqrtf(1.0f + a.r1.y - a.r0.x - a.r2.z);
+                    double s = 2.0f * sqrtf(1.0f + a.r1.y - a.r0.x - a.r2.z);
                     q.w = (a.r0.z - a.r2.x) / s;
                     q.x = (a.r0.y + a.r1.x) / s;
                     q.y = 0.25f * s;
                     q.z = (a.r1.z + a.r2.y) / s;
                 } else {
-                    float s = 2.0f * sqrtf(1.0f + a.r2.z - a.r0.x - a.r1.y);
+                    double s = 2.0f * sqrtf(1.0f + a.r2.z - a.r0.x - a.r1.y);
                     q.w = (a.r1.x - a.r0.y) / s;
                     q.x = (a.r0.z + a.r2.x) / s;
                     q.y = (a.r1.z + a.r2.y) / s;
@@ -1151,7 +1161,7 @@ namespace Vec_Math {
             return q;
         }
 
-		INLINE Quaternion quat_rotate_axis_angle(QUAT_INPUT quat, Vec3 axis, float rad) {
+		INLINE Quaternion quat_rotate_axis_angle(QUAT_INPUT quat, Vec3 axis, double rad) {
 			//return quat_left_multiply(quat,quat_from_axis_angle(axis, rad));
 			Quaternion vecQuat;
 			vecQuat.x = axis.x;
@@ -1162,17 +1172,17 @@ namespace Vec_Math {
 		}
 
         // roll->yaw->pitch order, which roll is outer, pitch is inner.
-        INLINE Quaternion quat_from_euler(float pitch, float yaw, float roll) {
-            float x = pitch / 2;
-            float y = yaw / 2;
-            float z = roll / 2;
+        INLINE Quaternion quat_from_euler(double pitch, double yaw, double roll) {
+            double x = pitch / 2;
+            double y = yaw / 2;
+            double z = roll / 2;
             
-            float cx = cosf(x);
-            float cy = cosf(y);
-            float cz = cosf(z);
-            float sx = sinf(x);
-            float sy = sinf(y);
-            float sz = sinf(z);
+            double cx = cosf(x);
+            double cy = cosf(y);
+            double cz = cosf(z);
+            double sx = sinf(x);
+            double sy = sinf(y);
+            double sz = sinf(z);
             
             Quaternion q = {
                 (sx * cy * cz) - (cx * sy * sz), (cx * sy * cz) + (sx * cy * sz),
@@ -1220,7 +1230,7 @@ namespace Vec_Math {
             Vec3 b = vec3_normalize(v2);
             Vec3 xUnitVec3 = vec3_create(1, 0, 0);
             Vec3 yUnitVec3 = vec3_create(0, 1, 0);
-            float dot = vec3_dot(a, b);
+            double dot = vec3_dot(a, b);
             if (dot < -0.999999f) {
                 Vec3 tmpvec3 = vec3_cross(xUnitVec3, a);
                 if (vec3_length(tmpvec3) < 0.000001f) {
@@ -1239,11 +1249,11 @@ namespace Vec_Math {
         INLINE double dot(QUAT_INPUT q1, QUAT_INPUT q2) {
             return q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z;
         }
-        INLINE Quaternion slerp(QUAT_INPUT q1, QUAT_INPUT q2, float t) {
-            float w1;
-            float w2;
-            float theta = acosf(dot(q1, q2));
-            float sinTheta = sinf(theta);
+        INLINE Quaternion slerp(QUAT_INPUT q1, QUAT_INPUT q2, double t) {
+            double w1;
+            double w2;
+            double theta = acosf(dot(q1, q2));
+            double sinTheta = sinf(theta);
             if (sinTheta > 0.000001f) {
                 w1 = (sinf(1.f - t) * theta) / sinTheta;
                 w2 = (sinf(t) * theta) / sinTheta;
@@ -1259,7 +1269,7 @@ namespace Vec_Math {
          * Transform                                                                   *
          \******************************************************************************/
         static const Transform transform_zero = {{0, 0, 0, 1}, {0, 0, 0}, 1};
-        INLINE Transform transform_lerp(TRANSFORM_INPUT a, TRANSFORM_INPUT b, float t) {
+        INLINE Transform transform_lerp(TRANSFORM_INPUT a, TRANSFORM_INPUT b, double t) {
             Transform T;
             T.orientation = vec4_lerp(a.orientation, b.orientation, t);
             T.position = vec3_lerp(a.position, b.position, t);
@@ -1268,18 +1278,18 @@ namespace Vec_Math {
         }
         INLINE Mat4 transform_get_matrix(TRANSFORM_INPUT t) {
             Quaternion q = t.orientation;
-            float xx = q.x * q.x;
-            float yy = q.y * q.y;
-            float zz = q.z * q.z;
+            double xx = q.x * q.x;
+            double yy = q.y * q.y;
+            double zz = q.z * q.z;
             
-            float xy = q.x * q.y;
-            float zw = q.z * q.w;
-            float xz = q.x * q.z;
-            float yw = q.y * q.w;
-            float yz = q.y * q.z;
-            float xw = q.x * q.w;
+            double xy = q.x * q.y;
+            double zw = q.z * q.w;
+            double xz = q.x * q.z;
+            double yw = q.y * q.w;
+            double yz = q.y * q.z;
+            double xw = q.x * q.w;
             
-            float s = t.scale;
+            double s = t.scale;
             
             Mat4 ret = {
                 {(1 - 2 * (yy + zz)) * s, (2 * (xy + zw)) * s, (2 * (xz - yw)) * s, 0.0f},
@@ -1306,18 +1316,18 @@ namespace Vec_Math {
         }
         INLINE Plane plane_from_point_normal(VEC3_INPUT pt, VEC3_INPUT norm) {
             Vec3 N = vec3_normalize(norm);
-            float D = -(N.x * pt.x + N.y * pt.y + N.z * pt.z);
+            double D = -(N.x * pt.x + N.y * pt.y + N.z * pt.z);
             return vec4_from_vec3(N, D);
         }
         INLINE Plane plane_normalize(PLANE_INPUT p) {
-            float dist = vec3_length(vec3_from_vec4(p));
+            double dist = vec3_length(vec3_from_vec4(p));
             Plane r = {
                 p.x / dist, p.y / dist, p.z / dist, p.w / dist,
             };
             return r;
         }
-        INLINE float plane_distance_point(PLANE_INPUT p, VEC3_INPUT pt) {
-            float dot = vec3_dot(pt, vec3_from_vec4(p));
+        INLINE double plane_distance_point(PLANE_INPUT p, VEC3_INPUT pt) {
+            double dot = vec3_dot(pt, vec3_from_vec4(p));
             return dot + p.w;
         }
         
@@ -1325,7 +1335,7 @@ namespace Vec_Math {
          * Sphere                                                                     *
          \******************************************************************************/
         INLINE int sphere_plane_intersect(PLANE_INPUT p, SPHERE_INPUT s) {
-            float dist = plane_distance_point(p, s.center);
+            double dist = plane_distance_point(p, s.center);
             if (fabsf(dist) < s.radius)
                 return 1;
             return 0;

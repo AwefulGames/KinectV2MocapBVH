@@ -151,7 +151,7 @@ void write_record(vector<Joint2> joints)
 	fstream fout;
 
 	// opens an existing csv file or creates a new file. 
-	fout.open("raw_quats_new.csv", ios::out | ios::app);
+	fout.open("raw_quats_new.csv", ios::out);
 	int line = 0;
 
 	// Read the input 
@@ -165,7 +165,7 @@ void write_record(vector<Joint2> joints)
 				<< pjoints[i].pos.y << ","
 				<< pjoints[i].pos.z << ","
 				<< pjoints[i].quat.x << ","
-				<< pjoints[i].quat.x << ","
+				<< pjoints[i].quat.y << ","
 				<< pjoints[i].quat.z << ","
 				<< pjoints[i].quat.w;
 
@@ -207,6 +207,12 @@ public:
         parent_joint_map[JointType_KneeRight] = JointType_HipRight;
         parent_joint_map[JointType_AnkleRight] = JointType_KneeRight;
         parent_joint_map[JointType_FootRight] = JointType_AnkleRight;
+
+
+		// opens an existing csv file or creates a new file. 
+		mout.open("matlab_data.csv", ios::out);
+		aout.open("axis_data.csv", ios::out );
+
     }
     
     // Destructor.
@@ -362,6 +368,12 @@ public:
     }
     
 private:
+
+	// file pointer 
+	fstream mout;
+	fstream aout;
+	fstream qout;
+
     float tilt_angle;
     // Frame counter.
     int m_nbFrame;
@@ -382,20 +394,154 @@ private:
         one_offset.z = offset.z * SCALE;
         m_aOffsets.push_back(one_offset);
     }
+
+
+	Vec3 euler321FromQuat(QUAT_INPUT q) {
+		float q0 = q.w;
+		float q1 = q.x;
+		float q2 = q.y;
+		float q3 = q.z;
+
+		float theta_c = asin(-2 * (q1*q3 - q0 * q2));
+		float psi_c = atan2(2 * (q0*q3 + q1 * q2), (pow(q0,2) + pow(q1,2) - pow(q2,2) - pow(q3,2)));
+		float phi_c = atan2(2 * (q0*q1 + q2 * q3), (pow(q0,2) - pow(q1,2) - pow(q2,2) + pow(q3,2)));
+
+		Vec3 angs;
+		angs.x = phi_c;
+		angs.y = theta_c;
+		angs.z = psi_c;
+
+		return angs;
+	}
+
+	Mat3 rotationFromQuat(QUAT_INPUT q) {
+		double q0 = q.w;
+		double q1 = q.x;
+		double q2 = q.y;
+		double q3 = q.z;
+
+		if (q0 == 0) return mat3_identity;
+
+		Mat3 Rq;
+		
+		Rq.r0.x = pow(q0, 2) + pow(q1, 2) - pow(q2, 2) - pow(q3, 2);
+		Rq.r0.y = 2 * (q1*q2 + q0 * q3);
+		Rq.r0.z = 2 * (-q0 * q2 + q1 * q3);
+
+		Rq.r1.x = 2 * (q1*q2 - q0 * q3);
+		Rq.r1.y = pow(q0,2) - pow(q1,2) + pow(q2,2) - pow(q3,2);
+		Rq.r1.z = 2 * (q2*q3 + q0 * q1);
+
+		Rq.r2.x = 2 * (q1*q3 + q0 * q2);
+		Rq.r2.y = 2 * (-q0 * q1 + q2 * q3);
+		Rq.r2.z = pow(q0,2) - pow(q1,2) - pow(q2,2) + pow(q3,2);
+
+		return Rq;
+	}
+
     
+	Mat3 rotFromQuat(QUAT_INPUT quat) {
+		Vec3 x_axis; x_axis.x = 1; x_axis.y = 0; x_axis.z = 0;
+		Vec3 y_axis; y_axis.x = 0; y_axis.y = 1; y_axis.z = 0;
+		Vec3 z_axis; z_axis.x = 0; z_axis.y = 0; z_axis.z = 1;
+
+		Mat3 m_parent;
+		Vec3 x = quat_get_x_axis(quat);
+		Vec3 y = quat_get_y_axis(quat);
+		Vec3 z = quat_get_z_axis(quat);
+		/*Vec3 x = quat_to_vec3(quat_rotate_axis_angle(quat, x_axis, 0.0f));
+		Vec3 y = quat_to_vec3(quat_rotate_axis_angle(quat, y_axis, 0.0f));
+		Vec3 z = quat_to_vec3(quat_rotate_axis_angle(quat, z_axis, 0.0f));*/
+
+		//m_parent.r0.x = x.x;
+		//m_parent.r0.y = y.x;
+		//m_parent.r0.z = z.x;
+
+		//m_parent.r1.x = x.y;
+		//m_parent.r1.y = y.y;
+		//m_parent.r1.z = z.y;
+
+		//m_parent.r2.x = x.z;
+		//m_parent.r2.y = y.z;
+		//m_parent.r2.z = z.z;
+
+		m_parent.r0 = x;
+		m_parent.r1 = y;
+		m_parent.r2 = z;
+		return m_parent;
+	}
+
+
+// https://www.learnopencv.com/rotation-matrix-to-euler-angles/
+// Calculates rotation matrix to euler angles
+// The result is the same as MATLAB except the order
+// of the euler angles ( x and z are swapped ).
+	Vec3 rotationMatrixToEulerAngles(MAT3_INPUT R)
+	{
+		double thetaX, thetaY, thetaZ;
+
+		if(R.r2.x < +1)
+		{
+			if(R.r2.x > -1.0f)
+			{
+				thetaY = asin(-R.r2.x);
+				thetaZ = atan2 (R.r1.x, R.r0.x);
+				thetaX = atan2 (R.r2.y, R.r2.z);
+			}
+			else // r 2 0 = -1
+			{
+				thetaY = kPiDiv2;
+				thetaZ = -atan2(-R.r1.z , R.r1.y);
+				thetaX = 0;
+			}
+		}
+		else // r 2 0 = +1
+		{
+			thetaY = -kPiDiv2;
+			thetaZ = atan2 (-R.r1.z , R.r1.y);
+			thetaX = 0;
+		}
+
+		Vec3 rt;
+		rt.x = thetaX;
+		rt.y = thetaY;
+		rt.z = thetaZ;
+		return rt;
+
+	}
+
     // Write the motion capture data of a joint.
     void WriteJoint(stringstream& flux, const Joint2* joints, const int idx) {
-        Vec3 angles = GetEulers(joints, idx);
+        //Vec3 angles = GetEulers(joints, idx);
 
-        flux << angles.z * kRadToDeg << " " << angles.y * kRadToDeg << " "
-        << angles.x * kRadToDeg << " ";
+//		Mat3 m_parent = BasisFromQuat(joints[parent_joint_map[idx]].quat);
+//		Mat3 m_child = BasisFromQuat(joints[idx].quat); 
+		
+		Mat3 m_parent = rotationFromQuat((joints[parent_joint_map[idx]].quat));
+		Mat3 m_child = rotationFromQuat((joints[idx].quat));
 
-		if (idx == JointType_HipLeft) {
-			cout << "HL: " << joints[JointType_HipLeft].quat.x << " " << joints[JointType_HipLeft].quat.y << " " << joints[JointType_HipLeft].quat.z << " ";
+		// m_child = rot_p_to_c * m_parent
+		Mat3 rot_p_to_c = mat3_multiply(m_child, mat3_inverse(m_parent));
+		
+		
+		Vec3 angles = rotationMatrixToEulerAngles(rot_p_to_c);
+		qout << joints[idx].quat.x << "," << joints[idx].quat.y << "," << joints[idx].quat.z << "," << joints[idx].quat.w;
+		mout << joints[idx].pos.x << "," << joints[idx].pos.y << "," << joints[idx].pos.z;
+		aout << m_child.r0.x << ","
+			<< m_child.r0.y << ","
+			<< m_child.r0.z << ","
+			<< m_child.r1.x << ","
+			<< m_child.r1.y << ","
+			<< m_child.r1.z << ","
+			<< m_child.r2.x << ","
+			<<  m_child.r2.y << ","
+			<< m_child.r2.z;
+		if (idx != JOINT_SIZE - 1) {
+			mout << ","; aout << ",";; qout << ",";
 		}
-		else if (idx == JointType_KneeLeft) {
-			cout << "KL: " << joints[JointType_KneeLeft].quat.x << " " << joints[JointType_KneeLeft].quat.y << " " << joints[JointType_KneeLeft].quat.z << " ";
-		}
+
+        flux << angles.x * kRadToDeg << " " << angles.y * kRadToDeg << " "
+        << angles.z * kRadToDeg << " ";
     }
     
     // Calculate the Euler angle of joint's relative rotation to its parent.
@@ -417,7 +563,7 @@ private:
                                            joints[idx].quat.z, joints[idx].quat.w);
         
         // Calculate the relative quaternion.
-        Quaternion q_delta = quat_left_multiply(q_current, quat_inverse(q_parent));
+        Quaternion q_delta = quat_right_multiply(q_current, quat_inverse(q_parent));
         
         // Convert to Euler angle, roll->yaw->pitch order, which roll is outer, pitch is inner.
         Vec3 angle = euler_from_quat(q_delta);
@@ -646,6 +792,8 @@ private:
         flux << "Frames: " << m_nbFrame << endl;
         flux << "Frame Time: " << FPS << endl;
         
+		qout.open("quat_check.csv", ios::out);
+
         for (int i = 0; i < static_cast<int>(m_vJointsOrientation.size() / JOINT_SIZE); i++) {
             // The position of the root joint in centimeter, 
             Joint2* joints = &m_vJointsOrientation[i * JOINT_SIZE];
@@ -675,8 +823,11 @@ private:
            // WriteJoint(flux, joints, JointType_FootRight);
             
             flux << endl;
+			mout << endl;
+			aout << endl;
+			qout << endl;
         }
-        
+		qout.close();
         m_pFile << flux.str();
     }
     
