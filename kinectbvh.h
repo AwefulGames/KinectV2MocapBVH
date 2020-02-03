@@ -347,9 +347,9 @@ public:
     void IncrementNbFrames() { ++m_nbFrame; }
     
     // Create the file, batch generate motion capture data, save to file, close the file.
-    void SaveToBVHFile(const string& filename) {
+    void SaveToBVHFile(const string& filename, bool save_orientations = true) {
 
-		//write_record(m_vJointsOrientation);
+		if (save_orientations) write_record(m_vJointsOrientation);
 
         m_pFile.open(filename.c_str());
         if (m_pFile.is_open()) {
@@ -453,21 +453,21 @@ private:
 		Vec3 y = quat_to_vec3(quat_rotate_axis_angle(quat, y_axis, 0.0f));
 		Vec3 z = quat_to_vec3(quat_rotate_axis_angle(quat, z_axis, 0.0f));*/
 
-		//m_parent.r0.x = x.x;
-		//m_parent.r0.y = y.x;
-		//m_parent.r0.z = z.x;
+		m_parent.r0.x = x.x;
+		m_parent.r0.y = y.x;
+		m_parent.r0.z = z.x;
 
-		//m_parent.r1.x = x.y;
-		//m_parent.r1.y = y.y;
-		//m_parent.r1.z = z.y;
+		m_parent.r1.x = x.y;
+		m_parent.r1.y = y.y;
+		m_parent.r1.z = z.y;
 
-		//m_parent.r2.x = x.z;
-		//m_parent.r2.y = y.z;
-		//m_parent.r2.z = z.z;
+		m_parent.r2.x = x.z;
+		m_parent.r2.y = y.z;
+		m_parent.r2.z = z.z;
 
-		m_parent.r0 = x;
-		m_parent.r1 = y;
-		m_parent.r2 = z;
+		//m_parent.r0 = x;
+		//m_parent.r1 = y;
+		//m_parent.r2 = z;
 		return m_parent;
 	}
 
@@ -516,9 +516,54 @@ private:
 
 //		Mat3 m_parent = BasisFromQuat(joints[parent_joint_map[idx]].quat);
 //		Mat3 m_child = BasisFromQuat(joints[idx].quat); 
+
+		Vec3 x_axis{ 1.0, 0.0, 0.0 };
+		Vec3 y_axis{ 0.0, 1.0, 0.0 };
+		Vec3 z_axis{ 0.0, 0.0, 1.0 };
+
+		// Rotate -90 degrees along y, then 180 around x
+		//joints[JointType_HipRight].quat = quat_rotate_axis_angle(joints[JointType_HipRight].quat, y_axis, kPiDiv2);
+		//joints[JointType_HipRight].quat = quat_rotate_axis_angle(joints[JointType_HipRight].quat, x_axis, kPi);
 		
+		//Quaternion hip1{ 0.0,1.0,0.0,-kPiDiv2 }; hip1 = quat_normalize(hip1);
+		//Quaternion hip2{ 0.0,0.0,kPi, 1 }; hip2 = quat_normalize(hip2);
+		Quaternion z_90 = quat_from_axis_angle(z_axis, kPiDiv2);
+		Quaternion y_90 = quat_from_axis_angle(y_axis, kPiDiv2);
+		Quaternion x_90 = quat_from_axis_angle(x_axis, kPiDiv2);
+		Quaternion z_180 = quat_from_axis_angle(z_axis, kPi);
+		Quaternion y_180 = quat_from_axis_angle(y_axis, kPi);
+		Quaternion x_180 = quat_from_axis_angle(x_axis, kPi);
+
 		Mat3 m_parent = rotationFromQuat((joints[parent_joint_map[idx]].quat));
-		Mat3 m_child = rotationFromQuat((joints[idx].quat));
+		Mat3 m_child = rotationFromQuat(joints[idx].quat);
+
+		switch (idx) {
+		case JointType_SpineMid:
+			m_child = rotationFromQuat(quat_left_multiply(joints[idx].quat, (y_180)) );
+		case JointType_HipRight:
+			m_child = rotationFromQuat(quat_left_multiply(quat_left_multiply(joints[idx].quat, z_180), y_90));
+			break;
+		case JointType_HipLeft:
+			m_child = rotationFromQuat(quat_left_multiply(quat_left_multiply(quat_left_multiply(joints[idx].quat, x_180), y_90), y_180));
+			break;
+		case JointType_KneeLeft:
+			m_child = rotationFromQuat(quat_left_multiply(joints[idx].quat, quat_conjugate(y_90)));
+			break;
+		case JointType_ShoulderLeft:
+			m_child = rotationFromQuat(quat_left_multiply(quat_left_multiply(joints[idx].quat, x_90 ), quat_conjugate(z_90) ));
+			break;
+		case JointType_ShoulderRight:
+			m_child = rotationFromQuat( quat_left_multiply(quat_left_multiply(joints[idx].quat, x_90 ), quat_conjugate(z_90) ) );
+			break;
+		case JointType_ElbowLeft:
+			//m_child = rotationFromQuat(quat_left_multiply(joints[idx].quat, (x_180) ) );
+			//m_child = rotationFromQuat(quat_left_multiply( quat_left_multiply(joints[idx].quat, quat_conjugate(y_90) ), x_90) );
+			break;
+		case JointType_ElbowRight:
+			//m_child = rotationFromQuat(quat_left_multiply( quat_left_multiply(quat_left_multiply(joints[idx].quat, (z_180)), x_180), y_90));
+			//m_child = rotationFromQuat(quat_left_multiply( joints[idx].quat, (y_180)) );
+			break;
+		}
 
 		// m_child = rot_p_to_c * m_parent
 		Mat3 rot_p_to_c = mat3_multiply(m_child, mat3_inverse(m_parent));
@@ -794,12 +839,12 @@ private:
         
 		qout.open("quat_check.csv", ios::out);
 
-        for (int i = 0; i < static_cast<int>(m_vJointsOrientation.size() / JOINT_SIZE); i++) {
+        for (int i = 1; i < static_cast<int>(m_vJointsOrientation.size() / JOINT_SIZE); i++) {
             // The position of the root joint in centimeter, 
             Joint2* joints = &m_vJointsOrientation[i * JOINT_SIZE];
             flux << joints[JointType_SpineBase].pos.x * SCALE  << " " << joints[JointType_SpineBase].pos.y * SCALE  << " "
             << joints[JointType_SpineBase].pos.z * SCALE << " ";
-            
+
             // Write the Euler angle of every joint(ZYX).
             WriteJoint(flux, joints, JointType_SpineBase);
             WriteJoint(flux, joints, JointType_SpineMid);

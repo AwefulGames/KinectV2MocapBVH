@@ -247,98 +247,100 @@ CBodyBasics::~CBodyBasics()
 /// <param name="nCmdShow">whether to display minimized, maximized, or normally</param>
 int CBodyBasics::Run(HINSTANCE hInstance, int nCmdShow)
 {
-    MSG       msg = {0};
-    WNDCLASS  wc;
+	MSG       msg = { 0 };
+	WNDCLASS  wc;
 
-    // Dialog custom window class
-    ZeroMemory(&wc, sizeof(wc));
-    wc.style         = CS_HREDRAW | CS_VREDRAW;
-    wc.cbWndExtra    = DLGWINDOWEXTRA;
-    wc.hCursor       = LoadCursorW(NULL, IDC_ARROW);
-    wc.hIcon         = LoadIconW(hInstance, MAKEINTRESOURCE(IDI_APP));
-    wc.lpfnWndProc   = DefDlgProcW;
-    wc.lpszClassName = L"BodyBasicsAppDlgWndClass";
+	// Dialog custom window class
+	ZeroMemory(&wc, sizeof(wc));
+	wc.style = CS_HREDRAW | CS_VREDRAW;
+	wc.cbWndExtra = DLGWINDOWEXTRA;
+	wc.hCursor = LoadCursorW(NULL, IDC_ARROW);
+	wc.hIcon = LoadIconW(hInstance, MAKEINTRESOURCE(IDI_APP));
+	wc.lpfnWndProc = DefDlgProcW;
+	wc.lpszClassName = L"BodyBasicsAppDlgWndClass";
 
-    if (!RegisterClassW(&wc))
-    {
-        return 0;
-    }
-
-    // Create main application window
-    HWND hWndApp = CreateDialogParamW(
-        NULL,
-        MAKEINTRESOURCE(IDD_APP),
-        NULL,
-        (DLGPROC)CBodyBasics::MessageRouter, 
-        reinterpret_cast<LPARAM>(this));
-
-    // Show window
-    ShowWindow(hWndApp, nCmdShow);
-
-	vector<Joint2> records = read_record();
-
-	m_pKinectBVH = new KinectBVH();
-	m_pKinectBVH->SetTiltAngle(0.0f);
-	m_pKinectBVH->CalibrateSkeleton();
-
-	for (int i = 0; i < static_cast<int>(records.size() / JOINT_SIZE); i++) {
-		// The position of the root joint in centimeter, 
-		Joint2* joints = &records[i * JOINT_SIZE];
-
-
-		Vec3 x_axis;
-		x_axis.x = 1;
-		x_axis.y = 0;
-		x_axis.z = 0;
-		//y_axis.w = kPi;
-
-		Vec3 y_axis;
-		y_axis.x = 0;
-		y_axis.y = 1;
-		y_axis.z = 0;
-		//y_axis.w = kPiDiv2;
-
-		Vec3 z_axis;
-		z_axis.x = 0;
-		z_axis.y = 0;
-		z_axis.z = 1;
-		//y_axis.w = kPi;
-
-		Quaternion x_quat;
-		x_quat.x = 1;
-		x_quat.y = 0;
-		x_quat.z = 0;
-		x_quat.w = kPiDiv2;
-
-		Quaternion y_quat;
-		y_quat.x = 0;
-		y_quat.y = 1;
-		y_quat.z = 0;
-		y_quat.w = kPiDiv2;
-
-		Quaternion z_quat;
-		z_quat.x = 0;
-		z_quat.y = 0;
-		z_quat.z = 1;
-		z_quat.w = -kPiDiv2;
-
-
-		// Add the positions of all joints.
-		m_pKinectBVH->AddAllJointsPosition(joints);
-
-		// Increase the frame number.
-		m_pKinectBVH->IncrementNbFrames();
-		
+	if (!RegisterClassW(&wc))
+	{
+		return 0;
 	}
-	
 
-	time_t nowtime = time(NULL);
-	struct tm *local = localtime(&nowtime);
-	char buf[256];
-	sprintf(buf, "%d-%d-%d-%d-%d-%d.bvh", local->tm_year + 1900, local->tm_mon + 1, local->tm_mday, local->tm_hour, local->tm_min, local->tm_sec);
-	m_pKinectBVH->SaveToBVHFile(buf);
+	// Create main application window
+	HWND hWndApp = CreateDialogParamW(
+		NULL,
+		MAKEINTRESOURCE(IDD_APP),
+		NULL,
+		(DLGPROC)CBodyBasics::MessageRouter,
+		reinterpret_cast<LPARAM>(this));
+	bool record_mode = false;
+	// Show window
+	if (record_mode) {
+		ShowWindow(hWndApp, nCmdShow);
+	} else {
+		vector<Joint2> records = read_record();
 
-	msg.message = WM_QUIT;
+		m_pKinectBVH = new KinectBVH();
+		m_pKinectBVH->SetTiltAngle(0.0f);
+		m_pKinectBVH->CalibrateSkeleton();
+
+		for (int i = 0; i < static_cast<int>(records.size() / JOINT_SIZE); i++) {
+			// The position of the root joint in centimeter, 
+			Joint2* joints = &records[i * JOINT_SIZE];
+
+
+			Vec3 x_axis;
+			x_axis.x = 1;
+			x_axis.y = 0;
+			x_axis.z = 0;
+			//y_axis.w = kPi;
+
+			Vec3 y_axis;
+			y_axis.x = 0;
+			y_axis.y = 1;
+			y_axis.z = 0;
+			//y_axis.w = kPiDiv2;
+
+			Vec3 z_axis;
+			z_axis.x = 0;
+			z_axis.y = 0;
+			z_axis.z = 1;
+			//y_axis.w = kPi;
+
+			Quaternion x_quat;
+			x_quat.x = 1;
+			x_quat.y = 0;
+			x_quat.z = 0;
+			x_quat.w = kPiDiv2;
+
+			Quaternion y_quat;
+			y_quat.x = 0;
+			y_quat.y = 1;
+			y_quat.z = 0;
+			y_quat.w = kPiDiv2;
+
+			Quaternion z_quat;
+			z_quat.x = 0;
+			z_quat.y = 0;
+			z_quat.z = 1;
+			z_quat.w = -kPiDiv2;
+
+
+			// Add the positions of all joints.
+			m_pKinectBVH->AddAllJointsPosition(joints);
+
+			// Increase the frame number.
+			m_pKinectBVH->IncrementNbFrames();
+
+		}
+
+
+		time_t nowtime = time(NULL);
+		struct tm *local = localtime(&nowtime);
+		char buf[256];
+		sprintf(buf, "%d-%d-%d-%d-%d-%d.bvh", local->tm_year + 1900, local->tm_mon + 1, local->tm_mday, local->tm_hour, local->tm_min, local->tm_sec);
+		m_pKinectBVH->SaveToBVHFile(buf, false);
+
+		msg.message = WM_QUIT;
+	}
 
     // Main message loop
     while (WM_QUIT != msg.message)
