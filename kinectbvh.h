@@ -539,7 +539,9 @@ private:
 
 		switch (idx) {
 		case JointType_SpineMid:
-			m_child = rotationFromQuat(quat_left_multiply(joints[idx].quat, (y_180)) );
+			//m_child = rotationFromQuat(quat_left_multiply(joints[idx].quat, z_90) );
+			//m_child = rotationFromQuat(quat_left_multiply(quat_left_multiply(joints[idx].quat, y_180), z_90));
+			break;
 		case JointType_HipRight:
 			m_child = rotationFromQuat(quat_left_multiply(quat_left_multiply(joints[idx].quat, z_180), y_90));
 			break;
@@ -585,8 +587,13 @@ private:
 			mout << ","; aout << ",";; qout << ",";
 		}
 
-        flux << angles.x * kRadToDeg << " " << angles.y * kRadToDeg << " "
-        << angles.z * kRadToDeg << " ";
+		if (idx != JointType_SpineBase) {
+			flux << 100.0f*(joints[idx].pos.x - joints[parent_joint_map[idx]].pos.x) << " "
+				<< 100.0f*(joints[idx].pos.y - joints[parent_joint_map[idx]].pos.y) << " "
+				<< 100.0f*(joints[idx].pos.z - joints[parent_joint_map[idx]].pos.z) << " ";
+		}
+		//flux << angles.z * kRadToDeg << " " << angles.y * kRadToDeg << " "
+	//		<< angles.x * kRadToDeg << " ";
     }
     
     // Calculate the Euler angle of joint's relative rotation to its parent.
@@ -629,8 +636,7 @@ private:
         flux << "\tOFFSET " << m_aOffsets[JointType_SpineBase].x << " "
             << m_aOffsets[JointType_SpineBase].y << " " << m_aOffsets[JointType_SpineBase].z
             << endl;
-        flux << "\tCHANNELS 6 Xposition Yposition Zposition Zrotation Yrotation "
-            "Xrotation"
+        flux << "\tCHANNELS 6 Xposition Yposition Zposition "
             << endl;
         flux << "\tJOINT ShoulderCenter" << endl;
         flux << "\t{" << endl;
@@ -638,21 +644,21 @@ private:
         // neck
         flux << "\t\tOFFSET " << m_aOffsets[JointType_SpineMid].x << " "
         << m_aOffsets[JointType_SpineMid].y << " " << m_aOffsets[JointType_SpineMid].z << endl;
-        flux << "\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\tCHANNELS 6 Xposition Yposition Zposition " << endl;
         flux << "\t\tJOINT Neck" << endl;
         flux << "\t\t{" << endl;
 
         // Head
         flux << "\t\t\tOFFSET " << m_aOffsets[JointType_Neck].x << " "
             << m_aOffsets[JointType_Neck].y << " " << m_aOffsets[JointType_Neck].z << endl;
-        flux << "\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\tCHANNELS 6 Xposition Yposition Zposition " << endl;
         flux << "\t\t\tJOINT Head" << endl;
         flux << "\t\t\t{" << endl;
 
         // End Site
         flux << "\t\t\t\tOFFSET " << m_aOffsets[JointType_Head].x << " "
         << m_aOffsets[JointType_Head].y << " " << m_aOffsets[JointType_Head].z << endl;
-        flux << "\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\t\tCHANNELS 6 Xposition Yposition Zposition " << endl;
         flux << "\t\t\t\tEnd Site" << endl;
         flux << "\t\t\t\t{" << endl;
         flux << "\t\t\t\t\tOFFSET 0.0 " << 18.0f * SCALE << " 0.0" << endl;
@@ -667,28 +673,28 @@ private:
         flux << "\t\t\tOFFSET " << m_aOffsets[JointType_ShoulderLeft].x << " "
             << m_aOffsets[JointType_ShoulderLeft].y << " "
             << m_aOffsets[JointType_ShoulderLeft].z << endl;
-        flux << "\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\tCHANNELS 6 Xposition Yposition Zposition " << endl;
         flux << "\t\t\tJOINT ElbowLeft" << endl;
         flux << "\t\t\t{" << endl;
         // Wrist Left
         flux << "\t\t\t\tOFFSET " << m_aOffsets[JointType_ElbowLeft].x << " "
             << m_aOffsets[JointType_ElbowLeft].y << " "
             << m_aOffsets[JointType_ElbowLeft].z << endl;
-        flux << "\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\t\tCHANNELS 6 Xposition Yposition Zposition " << endl;
         flux << "\t\t\t\tJOINT WristLeft" << endl;
         flux << "\t\t\t\t{" << endl;
         // Wrist Left
         flux << "\t\t\t\t\tOFFSET " << m_aOffsets[JointType_WristLeft].x << " "
             << m_aOffsets[JointType_WristLeft].y << " "
             << m_aOffsets[JointType_WristLeft].z << endl;
-        flux << "\t\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\t\t\tCHANNELS 6 Xposition Yposition Zposition " << endl;
         //flux << "\t\t\t\t\tJOINT HandLeft" << endl;
         //flux << "\t\t\t\t\t{" << endl;
         // Hand Left
        /* flux << "\t\t\t\t\t\tOFFSET " << m_aOffsets[JointType_HandLeft].x << " "
             << m_aOffsets[JointType_HandLeft].y << " "
             << m_aOffsets[JointType_HandLeft].z << endl;
-        flux << "\t\t\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;*/
+        flux << "\t\t\t\t\t\tCHANNELS 3 " << endl;*/
         flux << "\t\t\t\t\t\tEnd Site" << endl;
         flux << "\t\t\t\t\t\t{" << endl;
         flux << "\t\t\t\t\t\t\tOFFSET " << -8.32f * SCALE << " 0.0 0.0" << endl;
@@ -705,28 +711,28 @@ private:
         flux << "\t\t\tOFFSET " << m_aOffsets[JointType_ShoulderRight].x << " "
         << m_aOffsets[JointType_ShoulderRight].y << " "
         << m_aOffsets[JointType_ShoulderRight].z << endl;
-        flux << "\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\tCHANNELS 6 Xposition Yposition Zposition " << endl;
         flux << "\t\t\tJOINT ElbowRight" << endl;
         flux << "\t\t\t{" << endl;
         // Wrist Right
         flux << "\t\t\t\tOFFSET " << m_aOffsets[JointType_ElbowRight].x << " "
         << m_aOffsets[JointType_ElbowRight].y << " "
         << m_aOffsets[JointType_ElbowRight].z << endl;
-        flux << "\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\t\tCHANNELS 6 Xposition Yposition Zposition " << endl;
         flux << "\t\t\t\tJOINT WristRight" << endl;
         flux << "\t\t\t\t{" << endl;
         // Wrist Right
         flux << "\t\t\t\t\tOFFSET " << m_aOffsets[JointType_WristRight].x << " "
         << m_aOffsets[JointType_WristRight].y << " "
         << m_aOffsets[JointType_WristRight].z << endl;
-        flux << "\t\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\t\t\tCHANNELS 6 Xposition Yposition Zposition " << endl;
         //flux << "\t\t\t\t\tJOINT HandRight" << endl;
         //flux << "\t\t\t\t\t{" << endl;
         // Hand Right
        // flux << "\t\t\t\t\t\tOFFSET " << m_aOffsets[JointType_HandRight].x << " "
        //     << m_aOffsets[JointType_HandRight].y << " "
        //     << m_aOffsets[JointType_HandRight].z << endl;
-       // flux << "\t\t\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+       // flux << "\t\t\t\t\t\tCHANNELS 3 " << endl;
         flux << "\t\t\t\t\t\tEnd Site" << endl;
         flux << "\t\t\t\t\t\t{" << endl;
         flux << "\t\t\t\t\t\t\tOFFSET " << 8.32f * SCALE << " 0.0 0.0" << endl;
@@ -746,7 +752,7 @@ private:
         flux << "\t\tOFFSET " << m_aOffsets[JointType_HipLeft].x << " "
         << m_aOffsets[JointType_HipLeft].y << " " << m_aOffsets[JointType_HipLeft].z
         << endl;
-        flux << "\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\tCHANNELS 6 Xposition Yposition Zposition " << endl;
         flux << "\t\tJOINT KneeLeft" << endl;
         flux << "\t\t{" << endl;
         
@@ -754,7 +760,7 @@ private:
         flux << "\t\t\tOFFSET " << m_aOffsets[JointType_KneeLeft].x << " "
         << m_aOffsets[JointType_KneeLeft].y << " "
         << m_aOffsets[JointType_KneeLeft].z << endl;
-        flux << "\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\tCHANNELS 6 Xposition Yposition Zposition " << endl;
         flux << "\t\t\tJOINT AnkleLeft" << endl;
         flux << "\t\t\t{" << endl;
         
@@ -762,7 +768,7 @@ private:
         flux << "\t\t\t\tOFFSET " << m_aOffsets[JointType_AnkleLeft].x << " "
         << m_aOffsets[JointType_AnkleLeft].y << " "
         << m_aOffsets[JointType_AnkleLeft].z << endl;
-        flux << "\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\t\tCHANNELS 6 Xposition Yposition Zposition " << endl;
         //flux << "\t\t\t\tJOINT FootLeft" << endl;
         //flux << "\t\t\t\t{" << endl;
 
@@ -770,7 +776,7 @@ private:
         //flux << "\t\t\t\t\tOFFSET " << m_aOffsets[JointType_FootLeft].x << " "
         //    << m_aOffsets[JointType_FootLeft].y << " "
         //    << m_aOffsets[JointType_FootLeft].z << endl;
-        //flux << "\t\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        //flux << "\t\t\t\t\tCHANNELS 3 " << endl;
 
         flux << "\t\t\t\t\tEnd Site" << endl;
         flux << "\t\t\t\t\t{" << endl;
@@ -789,7 +795,7 @@ private:
         flux << "\t\tOFFSET " << m_aOffsets[JointType_HipRight].x << " "
             << m_aOffsets[JointType_HipRight].y << " " << m_aOffsets[JointType_HipRight].z
             << endl;
-        flux << "\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\tCHANNELS 6 Xposition Yposition Zposition " << endl;
         flux << "\t\tJOINT KneeRight" << endl;
         flux << "\t\t{" << endl;
 
@@ -797,7 +803,7 @@ private:
         flux << "\t\t\tOFFSET " << m_aOffsets[JointType_KneeRight].x << " "
             << m_aOffsets[JointType_KneeRight].y << " "
             << m_aOffsets[JointType_KneeRight].z << endl;
-        flux << "\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\tCHANNELS 6 Xposition Yposition Zposition " << endl;
         flux << "\t\t\tJOINT AnkleRight" << endl;
         flux << "\t\t\t{" << endl;
 
@@ -805,7 +811,7 @@ private:
         flux << "\t\t\t\tOFFSET " << m_aOffsets[JointType_AnkleRight].x << " "
             << m_aOffsets[JointType_AnkleRight].y << " "
             << m_aOffsets[JointType_AnkleRight].z << endl;
-        flux << "\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        flux << "\t\t\t\tCHANNELS 6 Xposition Yposition Zposition " << endl;
         //flux << "\t\t\t\tJOINT FootRight" << endl;
        // flux << "\t\t\t\t{" << endl;
 
@@ -813,7 +819,7 @@ private:
         //flux << "\t\t\t\t\tOFFSET " << m_aOffsets[JointType_FootRight].x << " "
         //    << m_aOffsets[JointType_FootRight].y << " "
         //    << m_aOffsets[JointType_FootRight].z << endl;
-        //flux << "\t\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
+        //flux << "\t\t\t\t\tCHANNELS 3 " << endl;
 
         flux << "\t\t\t\t\tEnd Site" << endl;
         flux << "\t\t\t\t\t{" << endl;
