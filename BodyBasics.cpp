@@ -324,25 +324,25 @@ int CBodyBasics::Run(HINSTANCE hInstance, int nCmdShow)
 			z_quat.w = -kPiDiv2;
 
 
-			joints[JointType_HipLeft].quat = joints[JointType_KneeLeft].quat;
-			joints[JointType_KneeLeft].quat = joints[JointType_AnkleLeft].quat;
-			joints[JointType_AnkleLeft].quat = joints[JointType_FootLeft].quat;
+			//joints[JointType_HipLeft].quat = joints[JointType_KneeLeft].quat;
+			//joints[JointType_KneeLeft].quat = joints[JointType_AnkleLeft].quat;
+			//joints[JointType_AnkleLeft].quat = joints[JointType_FootLeft].quat;
 
-			joints[JointType_HipRight].quat = joints[JointType_KneeRight].quat;
-			joints[JointType_KneeRight].quat = joints[JointType_AnkleRight].quat;
-			joints[JointType_AnkleRight].quat = joints[JointType_AnkleRight].quat;
+			//joints[JointType_HipRight].quat = joints[JointType_KneeRight].quat;
+			//joints[JointType_KneeRight].quat = joints[JointType_AnkleRight].quat;
+			//joints[JointType_AnkleRight].quat = joints[JointType_AnkleRight].quat;
 
-			joints[JointType_ShoulderLeft].quat = joints[JointType_ElbowLeft].quat;
-			joints[JointType_ElbowLeft].quat = joints[JointType_WristLeft].quat;
-			joints[JointType_WristLeft].quat = joints[JointType_HandLeft].quat;
+			//joints[JointType_ShoulderLeft].quat = joints[JointType_ElbowLeft].quat;
+			//joints[JointType_ElbowLeft].quat = joints[JointType_WristLeft].quat;
+			//joints[JointType_WristLeft].quat = joints[JointType_HandLeft].quat;
 
-			joints[JointType_ShoulderRight].quat = joints[JointType_ElbowRight].quat;
-			joints[JointType_ElbowRight].quat = joints[JointType_WristRight].quat;
-			joints[JointType_WristRight].quat = joints[JointType_HandRight].quat;
+			//joints[JointType_ShoulderRight].quat = joints[JointType_ElbowRight].quat;
+			//joints[JointType_ElbowRight].quat = joints[JointType_WristRight].quat;
+			//joints[JointType_WristRight].quat = joints[JointType_HandRight].quat;
 
-			joints[JointType_SpineBase].quat = joints[JointType_SpineMid].quat;
-			joints[JointType_SpineMid].quat = joints[JointType_Neck].quat;
-			joints[JointType_Neck].quat = joints[JointType_Head].quat;
+			//joints[JointType_SpineBase].quat = joints[JointType_SpineMid].quat;
+			//joints[JointType_SpineMid].quat = joints[JointType_Neck].quat;
+			//joints[JointType_Neck].quat = joints[JointType_Head].quat;
 
 			// Add the positions of all joints.
 			m_pKinectBVH->AddAllJointsPosition(joints);

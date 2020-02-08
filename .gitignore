@@ -1,0 +1,7 @@
+*.bvh
+.vs/
+BodyBasics-D2D.vcxproj.user
+Debug/
+axis_data.csv
+matlab_data.csv
+quat_check.csv
