@@ -200,13 +200,18 @@ def read_some_data(context, filepath, use_some_setting):
                         bones[bone_name].head = (bone_pos[bone_parent[bone_name]][0], bone_pos[bone_parent[bone_name]][1], bone_pos[bone_parent[bone_name]][2])
                 
                 bones[bone_name].tail = (bone_pos[bone_name][0],bone_pos[bone_name][1],bone_pos[bone_name][2])
+
+
             
         else:
             bpy.ops.object.mode_set(mode='POSE', toggle=False)
 
             for c_bone in jimbo.pose.bones:
                 bone_name = c_bone.name
-                print(bone_name)
+
+                if (frame_id == 0):
+                    print(bone_name)
+                    print(c_bone.rotation_quaternion)
 
                 idx = bone_index[bone_name]*4
 
@@ -218,7 +223,19 @@ def read_some_data(context, filepath, use_some_setting):
                 new_pose = quat_rotate(original_pose, bone_quat[bone_name])
 
 
-                c_bone.rotation_quaternion = bone_quat[bone_name]
+#                
+
+                c_bone.rotation_quaternion = [1,0,0,0]
+
+                if ("SpineBase" in bone_name):
+                    c_bone.rotation_quaternion = quat_from_axis_angle([1,0,0], 3.14158/2)
+
+
+                if ("ElbowLeft" in bone_name):
+                    c_bone.rotation_quaternion = bone_quat[bone_name]
+
+
+
 
                 # if "SpineBase" in bone_name:
                 #     c_bone.tail = (new_pose[0],new_pose[1],new_pose[2])
@@ -247,7 +264,8 @@ def read_some_data(context, filepath, use_some_setting):
                 #add keyframe
                 #bones[bone_name].keyframe_insert(data_path="head", frame=frame_id)
                 c_bone.keyframe_insert(data_path="rotation_quaternion", frame=frame_id)
-                frame_id = frame_id+1
+
+            frame_id = frame_id+1
 
 
     return {'FINISHED'}
@@ -325,6 +343,32 @@ def quat_rotate(vector, quat):
     new_v[2] = 2*(quat[1]*quat[3] + quat[0]*quat[2]) * vector[0] + 2*(quat[2]*quat[3] - quat[0]*quat[1]) * vector[1] +     (1 - 2*quat[1]**2 - 2*quat[2]**2) * vector[2]
 
     return new_v
+
+def vec_normalize (vec):
+
+    mag = calc_length(vec)
+
+    vec[0] = vec[0]/mag;
+    vec[1] = vec[1]/mag;
+    vec[2] = vec[2]/mag;
+
+    return vec
+
+
+def quat_from_axis_angle( axis, rad):
+    q = [0,0,0,0]
+
+    norm = vec_normalize(axis);
+    a = rad * 0.5
+    s = math.sin(a)
+
+    q[0] = math.cos(a)
+    q[1] = norm[0] * s;
+    q[2] = norm[1] * s;
+    q[3] = norm[2] * s;
+        
+    return q
+
 
 if __name__ == "__main__":
     register()

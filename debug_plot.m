@@ -8,7 +8,7 @@ hold off
 joint(1) = 0;
 joint_a(1) = 0;
 a=1;
-for i=300:300;
+for i=1:1;
 joint_counter = 1;
   
   for j=1:3:length(data(1,:))

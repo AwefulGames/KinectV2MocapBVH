@@ -1,6 +1,6 @@
 function plot_basis(basis, pos)
   
-  r = 0.1;
+  r = 10;
   
   
   

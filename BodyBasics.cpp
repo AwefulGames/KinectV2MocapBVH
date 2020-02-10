@@ -101,25 +101,25 @@ void ProcessBonesOrientation(const Joint* pJoints, const JointOrientation* pJoin
 	z_quat.z = 1;
 	z_quat.w = -kPiDiv2;
 
-	joints[JointType_HipLeft].quat = joints[JointType_KneeLeft].quat;
-	joints[JointType_KneeLeft].quat = joints[JointType_AnkleLeft].quat;
-	joints[JointType_AnkleLeft].quat = joints[JointType_FootLeft].quat;
+	//joints[JointType_HipLeft].quat = joints[JointType_KneeLeft].quat;
+	//joints[JointType_KneeLeft].quat = joints[JointType_AnkleLeft].quat;
+	//joints[JointType_AnkleLeft].quat = joints[JointType_FootLeft].quat;
 
-	joints[JointType_HipRight].quat = joints[JointType_KneeRight].quat;
-	joints[JointType_KneeRight].quat = joints[JointType_AnkleRight].quat;
-	joints[JointType_AnkleRight].quat = joints[JointType_AnkleRight].quat;
+	//joints[JointType_HipRight].quat = joints[JointType_KneeRight].quat;
+	//joints[JointType_KneeRight].quat = joints[JointType_AnkleRight].quat;
+	//joints[JointType_AnkleRight].quat = joints[JointType_AnkleRight].quat;
 
-	joints[JointType_ShoulderLeft].quat = joints[JointType_ElbowLeft].quat;
-	joints[JointType_ElbowLeft].quat = joints[JointType_WristLeft].quat;
-	joints[JointType_WristLeft].quat = joints[JointType_HandLeft].quat;
+	//joints[JointType_ShoulderLeft].quat = joints[JointType_ElbowLeft].quat;
+	//joints[JointType_ElbowLeft].quat = joints[JointType_WristLeft].quat;
+	//joints[JointType_WristLeft].quat = joints[JointType_HandLeft].quat;
 
-	joints[JointType_ShoulderRight].quat = joints[JointType_ElbowRight].quat;
-	joints[JointType_ElbowRight].quat = joints[JointType_WristRight].quat;
-	joints[JointType_WristRight].quat = joints[JointType_HandRight].quat;
+	//joints[JointType_ShoulderRight].quat = joints[JointType_ElbowRight].quat;
+	//joints[JointType_ElbowRight].quat = joints[JointType_WristRight].quat;
+	//joints[JointType_WristRight].quat = joints[JointType_HandRight].quat;
 
-	joints[JointType_SpineBase].quat = joints[JointType_SpineMid].quat;
-	joints[JointType_SpineMid].quat = joints[JointType_Neck].quat;
-	joints[JointType_Neck].quat = joints[JointType_Head].quat;
+	//joints[JointType_SpineBase].quat = joints[JointType_SpineMid].quat;
+	//joints[JointType_SpineMid].quat = joints[JointType_Neck].quat;
+	//joints[JointType_Neck].quat = joints[JointType_Head].quat;
 
 
 	//joints[JointType_SpineMid].quat = quat_rotate_axis_angle(quat_rotate_axis_angle(joints[JointType_SpineMid].quat, y_axis, kPiDiv2), z_axis, -kPiDiv2);
