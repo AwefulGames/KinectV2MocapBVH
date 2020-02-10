@@ -225,14 +225,7 @@ def read_some_data(context, filepath, use_some_setting):
 
 #                
 
-                c_bone.rotation_quaternion = [1,0,0,0]
-
-                if ("SpineBase" in bone_name):
-                    c_bone.rotation_quaternion = quat_from_axis_angle([1,0,0], 3.14158/2)
-
-
-                if ("ElbowLeft" in bone_name):
-                    c_bone.rotation_quaternion = bone_quat[bone_name]
+                c_bone.rotation_quaternion = bone_quat[bone_name]
 
 
 

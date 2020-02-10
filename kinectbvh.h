@@ -527,8 +527,6 @@ private:
 		Vec3 y_axis{ 0.0, 1.0, 0.0 };
 		Vec3 z_axis{ 0.0, 0.0, 1.0 };
 
-        bout << joints[idx].quat.w << "," << joints[idx].quat.x << "," <<  joints[idx].quat.y << "," << joints[idx].quat.z;
-
 		// Rotate -90 degrees along y, then 180 around x
 		//joints[JointType_HipRight].quat = quat_rotate_axis_angle(joints[JointType_HipRight].quat, y_axis, kPiDiv2);
 		//joints[JointType_HipRight].quat = quat_rotate_axis_angle(joints[JointType_HipRight].quat, x_axis, kPi);
@@ -545,6 +543,8 @@ private:
 		Mat3 m_parent = rotationFromQuat((joints[parent_joint_map[idx]].quat));
 		Mat3 m_child = rotationFromQuat(joints[idx].quat);
 
+        Quaternion write_quat = joints[idx].quat;
+
 		switch (idx) {
         case JointType_SpineBase:
             break;
@@ -553,17 +553,23 @@ private:
 		//	//m_child = rotationFromQuat(quat_left_multiply(quat_left_multiply(joints[idx].quat, y_180), z_90));
 			break;
 		case JointType_HipRight:
-			//m_child = rotationFromQuat(quat_left_multiply(quat_left_multiply(joints[idx].quat, y_180), quat_conjugate(z_90)));
+            write_quat = quat_right_multiply(quat_conjugate(z_90), joints[idx].quat);
 			break;
         case JointType_KneeRight:
-            m_child = rotationFromQuat(quat_left_multiply(quat_left_multiply(joints[idx].quat, y_180), quat_conjugate(z_90)));
+            write_quat = quat_right_multiply(quat_conjugate(y_90), quat_right_multiply(x_180, joints[idx].quat));
+            break;
+        case JointType_AnkleRight:
+            //write_quat = quat_right_multiply(y_180, quat_right_multiply(x_180, joints[idx].quat));
             break;
 		case JointType_HipLeft:
-			//m_child = rotationFromQuat(quat_left_multiply(joints[idx].quat, quat_conjugate(y_90)));
+            write_quat = quat_right_multiply(z_90, joints[idx].quat);
 			break;
 		case JointType_KneeLeft:
-            m_child = rotationFromQuat(quat_left_multiply(joints[idx].quat, quat_conjugate(y_90)));
+            write_quat = quat_right_multiply((y_90), quat_right_multiply(x_180, joints[idx].quat));
 			break;
+        case JointType_AnkleLeft:
+            //write_quat = quat_right_multiply(quat_conjugate(x_90), quat_right_multiply( quat_conjugate(z_90), joints[idx].quat));
+            break;
 		/*case JointType_ShoulderLeft:
             m_child = rotationFromQuat(quat_left_multiply(quat_left_multiply(joints[idx].quat, y_90), quat_conjugate(z_90)));
 			break;
@@ -583,6 +589,9 @@ private:
             m_child = rotationFromQuat(quat_left_multiply(quat_left_multiply(joints[idx].quat, y_90), quat_conjugate(z_90)));
             break;
 		}
+
+
+        bout << write_quat.w << "," << write_quat.x << "," << write_quat.y << "," << write_quat.z;
 
 		// m_child = rot_p_to_c * m_parent
 		Mat3 rot_p_to_c = mat3_multiply(m_child, mat3_inverse(m_parent));

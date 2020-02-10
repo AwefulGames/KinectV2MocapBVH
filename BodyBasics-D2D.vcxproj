@@ -40,7 +40,7 @@
     <ProjectGuid>{6E5E35A2-7A3B-4671-AD85-B39DC5D710C9}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>BodyBasics-D2D</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">

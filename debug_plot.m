@@ -8,7 +8,7 @@ hold off
 joint(1) = 0;
 joint_a(1) = 0;
 a=1;
-for i=1:1;
+for i=361:361;
 joint_counter = 1;
   
   for j=1:3:length(data(1,:))
@@ -37,7 +37,7 @@ joint_counter = 1;
     %endfor
     a+=9;
     
-    %plot3(joint(joint_counter,1), joint(joint_counter,2), joint(joint_counter,3), 'r+', 'linewidth',3)
+    plot3(joint(joint_counter,1), joint(joint_counter,2), joint(joint_counter,3), 'r+', 'linewidth',3)
 
 %figure()    
         hold on
