@@ -271,7 +271,7 @@ int CBodyBasics::Run(HINSTANCE hInstance, int nCmdShow)
 		NULL,
 		(DLGPROC)CBodyBasics::MessageRouter,
 		reinterpret_cast<LPARAM>(this));
-	bool record_mode = false;
+	bool record_mode = true;
 	// Show window
 	if (record_mode) {
 		ShowWindow(hWndApp, nCmdShow);
